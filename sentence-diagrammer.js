@@ -1,4 +1,4 @@
-var draw = SVG().addTo('#canvas').size(500,500);
+var draw = SVG().addTo('#canvas').size(500,300);
 // var rect = draw.rect(100,100).attr({ fill: '#f06' });
 
 function basicSentence() {
@@ -31,3 +31,6 @@ function addModifier(xYcoords, wordStr, labelStr) {
 addModifier([10, 100], "the", "article");
 addModifier([60, 100], "quick", "adjective");
 addModifier([110, 100], "brown", "adjective");
+
+var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
+document.getElementById('download-link').href=url;
