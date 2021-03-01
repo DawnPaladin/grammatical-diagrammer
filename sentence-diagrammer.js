@@ -1,16 +1,15 @@
 var draw = SVG().addTo('#canvas').size(500,300);
-// var rect = draw.rect(100,100).attr({ fill: '#f06' });
-
-function basicSentence() {
-
-}
 
 const lineStyle = { width: 3, color: "black" };
 const textFont = { size: 24, anchor: "middle" };
 const labelFont = { size: 24, fill: "blue" };
 
-var horizLine = draw.line(0, 100, 500, 100).stroke(lineStyle);
-var vertLine = draw.line(250, 0, 250, 150).stroke(lineStyle);
+function clauseLines() {
+	var horizLine = draw.line(0, 100, 500, 100).stroke(lineStyle);
+	var vertLine = draw.line(250, 0, 250, 150).stroke(lineStyle);
+}
+clauseLines();
+
 var fox = draw.text("fox").move(125, 70).font(textFont);
 var jumps = draw.text("jumps").move(250+125, 70).font(textFont);
 
@@ -33,4 +32,4 @@ addModifier([60, 100], "quick", "adjective");
 addModifier([110, 100], "brown", "adjective");
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
-document.getElementById('download-link').href=url;
+document.getElementById('download-link').href = url;
