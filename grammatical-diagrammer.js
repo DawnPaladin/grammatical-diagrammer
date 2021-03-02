@@ -16,7 +16,7 @@ var jumps = draw.text("jumps").move(250+125, 70).font(textFont);
 var nounLabel = draw.text("(noun)").move(150, 70).font(labelFont).addClass('label');
 var verbLabel = draw.text("(verb)").move(410, 70).font(labelFont).addClass('label');
 
-function addModifier(xYcoords, wordStr, labelStr) {
+function addDescendingModifier(xYcoords, wordStr, labelStr) {
 	const [xStart, yStart] = xYcoords;
 	const lineLength = 200;
 	var line = draw.line(xStart, yStart, xStart+lineLength, yStart).stroke(lineStyle);
@@ -27,9 +27,9 @@ function addModifier(xYcoords, wordStr, labelStr) {
 	group.add(word).add(label).add(line);
 	group.transform({ rotate: 63, origin: "bottom left", translateX: 40 })
 }
-addModifier([10, 100], "the", "article");
-addModifier([60, 100], "quick", "adjective");
-addModifier([110, 100], "brown", "adjective");
+addDescendingModifier([10, 100], "the", "article");
+addDescendingModifier([60, 100], "quick", "adjective");
+addDescendingModifier([110, 100], "brown", "adjective");
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
 document.getElementById('download-link').href = url;
