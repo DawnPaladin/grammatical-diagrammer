@@ -32,4 +32,5 @@ addDescendingModifier([60, 100], "quick", "adjective");
 addDescendingModifier([110, 100], "brown", "adjective");
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
+// @ts-ignore
 document.getElementById('download-link').href = url;

@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+	  "module": "commonjs",
+	  "target": "es6",
+	  "lib":["esnext", "dom"],
+	  "checkJs": true,
+	},
+	"exclude": ["node_modules", "**/node_modules/*", "svg.js"],
+}
