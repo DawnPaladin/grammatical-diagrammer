@@ -1,26 +1,32 @@
 const darkMode = true;
+const foregroundColor = darkMode ? "white" : "black";
 const canvasSize = [500, 300];
-const lineStyle = { width: 3, color: darkMode ? "white" : "black" };
-const textFont = { size: 24, fill: darkMode ? "black" : "white"};
+const lineStyle = { width: 3, color: foregroundColor };
+const textFont = { size: 24, fill: foregroundColor };
 const labelFont = { size: 24, fill: "blue" };
 const descenderOffset = 24; // distance between descender attachment points
 
 var draw = SVG().addTo('#canvas').size(...canvasSize);
 
-if (darkMode) {
-	// draw.rect(...canvasSize).attr({ fill: "black" });
+class Point {
+	/**
+	 * @param {number} x
+	 * @param {number} y
+	 */
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
 }
 
-/**
- * 
- * @param {Object} options
- * @param {Point} options.origin
- * @param {string} options.text
- * @param {string} options.label
- * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
- * @returns {Word}
- */
 class Word {
+	/**
+	 * @param {object} options
+	 * @param {Point} options.origin
+	 * @param {string} options.text
+	 * @param {string} options.label
+	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
+	 */
 	constructor(options) {
 		this.origin = options.origin;
 		this.text = options.text;
@@ -80,8 +86,7 @@ class Word {
 		return attachPoint;
 	}
 	/**
-	 * 
-	 * @param {Object} options 
+	 * @param {object} options 
 	 * @param {string} options.text
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
@@ -99,63 +104,76 @@ class Word {
 		return newWord;
 	}
 }
-/**
- * 
- * @param {number} x
- * @param {number} y
- * @returns {Point}
- */
-class Point {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
+
+class Sentence {
+	/**
+	 * @param {object} options 
+	 * @param {string} options.subject
+	 * @param {string} options.verb
+	 * @param {string} options.direction
+	 * @param {Point} [options.origin]
+	 */
+	constructor(options) {
+		this.subjectText = options.subject;
+		this.verbText = options.verb;
+		this.direction = options.direction;
+		this.origin = options.origin || new Point(10, 40);
+
+		this.group = draw.group();
+		this.subject = new Word({
+			origin: this.origin,
+			text: this.subjectText,
+			label: "subject",
+			direction: this.direction
+		});
+		var subjectVerbDivider = this.drawSubjectVerbDivider();
+		this.verb = new Word({
+			origin: new Point(this.proceedInSentenceDirection(this.origin.x, this.subject.group.width()), this.origin.y),
+			text: this.verbText,
+			label: "verb",
+			direction: this.direction
+		})
+		this.group.add(this.subject.group);
+		this.group.add(subjectVerbDivider);
+		this.group.add(this.verb.group);
 	}
+
+	/**
+	 * Add two numbers if the sentence is LTR, otherwise subtract them.
+	 * @param {number} a
+	 * @param {number} b
+	 */
+	proceedInSentenceDirection(a, b) {
+		if (this.direction == "right") {
+			return a + b;
+		} else if (this.direction == "left") {
+			return a - b;
+		} else {
+			throw new Error("Invalid sentence direction " + this.direction);
+		}
+	}
+
+	drawSubjectVerbDivider() {
+		let x = this.proceedInSentenceDirection(this.origin.x, this.subject.group.width());
+		let startY = this.origin.y - 30;
+		let endY = this.origin.y + 20;
+		const subjectVerbDivider = draw.line(x, startY, x, endY).stroke(lineStyle);
+		return subjectVerbDivider;
+	}
+
 }
 
-var fox = new Word({
-	origin: new Point(100, 130),
-	text: "fox",
-	label: "subject",
-	direction: "right"
+var test = new Sentence({
+	subject: "fox",
+	verb: "jumps",
+	direction: "right",
 });
-var jumps = new Word({
-	origin: new Point(150, 130),
-	text: "jumps",
-	label: "verb",
-	direction: "right"
-});
-fox.addSlantedModifier({
-	text: "quick",
+test.subject.addSlantedModifier({
+	text: "the",
 	label: "article",
 	direction: "downRight"
-});
+})
 
-function clauseLines() {
-	var horizLine = draw.line(0, 100, 500, 100).stroke(lineStyle);
-	var vertLine = draw.line(250, 0, 250, 150).stroke(lineStyle);
-}
-// clauseLines();
-
-// var fox = draw.text("fox").move(125, 70).font(textFont);
-// var jumps = draw.text("jumps").move(250+125, 70).font(textFont);
-
-// var nounLabel = draw.text("(noun)").move(150, 70).font(labelFont).addClass('label');
-// var verbLabel = draw.text("(verb)").move(410, 70).font(labelFont).addClass('label');
-
-function addDescendingModifier(xYcoords, wordStr, labelStr) {
-	const [xStart, yStart] = xYcoords;
-	const lineLength = 200;
-	var line = draw.line(xStart, yStart, xStart+lineLength, yStart).stroke(lineStyle);
-	var word = draw.text(wordStr).move(xStart+50, yStart-30).font(textFont);
-	var labelOffset = wordStr.length * 8 + 50;
-	var label = draw.text("("+labelStr+")").move(xStart+labelOffset, yStart-30).font(labelFont).addClass('label');
-	var group = draw.group();
-	group.add(word).add(label).add(line);
-	group.transform({ rotate: 63, origin: "bottom left", translateX: 40 })
-}
-// addDescendingModifier([10, 100], "the", "article");
-// addDescendingModifier([60, 100], "quick", "adjective");
-// addDescendingModifier([110, 100], "brown", "adjective");
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
 // @ts-ignore
