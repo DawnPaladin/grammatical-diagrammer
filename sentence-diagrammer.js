@@ -1,10 +1,10 @@
-const darkMode = true;
+const darkMode = false;
 const foregroundColor = darkMode ? "white" : "black";
 const canvasSize = [500, 300];
 const lineStyle = { width: 3, color: foregroundColor };
 const textFont = { size: 24, fill: foregroundColor };
 const labelFont = { size: 24, fill: "blue" };
-const descenderOffset = 24; // distance between descender attachment points
+const descenderOffset = 45; // distance between descender attachment points
 
 var draw = SVG().addTo('#canvas').size(...canvasSize);
 
@@ -34,18 +34,14 @@ class Word {
 		this.direction = options.direction;
 
 		this.group = draw.group();
-		this.wordSvg = this.createWordSvg();
-		this.length = this.calcLength();
-		this.lineEndpoint = this.calcLineEndpoint();
-		this.line = this.createLine();
 		this.attachments = [];
+		this.descenders = [];
 
-		this.group.add(this.line);
-		this.group.add(this.wordSvg);
-
-		this.transformGroup();
+		this.render();
 	}
 	createLine() {
+		this.length = this.calcLength();
+		this.lineEndpoint = this.calcLineEndpoint();
 		return draw.line(
 			0, 0,
 			this.lineEndpoint.x, this.lineEndpoint.y
@@ -55,7 +51,11 @@ class Word {
 		return draw.text(this.text).attr({ x: 20, y: -38 }).font(textFont);
 	}
 	calcLength() {
-		return this.wordSvg.length() + 40;
+		var extraSpaceForDescenders = 0;
+		if (this.descenders.length > 1) {
+			extraSpaceForDescenders = (this.descenders.length - 1) * 40;
+		}
+		return this.wordSvg.length() + 40 + extraSpaceForDescenders;
 	}
 	calcLineEndpoint() {
 		var x;
@@ -100,8 +100,28 @@ class Word {
 			label: options.label,
 			direction: options.direction
 		});
-		this.group.add(newWord.group);
+		this.descenders.push(newWord);
+		this.render();
 		return newWord;
+	}
+	render() {
+		this.group.remove();
+		this.group = draw.group();
+		this.wordSvg = this.createWordSvg();
+		this.line = this.createLine();
+
+		this.group.add(this.line);
+		this.group.add(this.wordSvg);
+
+		this.transformGroup();
+
+		// reset attachpoints
+		this.attachments = [];
+		// add descender groups to parent group
+		this.descenders.forEach(descender => {
+			const attachPoint = this.newAttachment();
+			this.group.add(descender.group)
+		})
 	}
 }
 
@@ -172,7 +192,12 @@ test.subject.addSlantedModifier({
 	text: "the",
 	label: "article",
 	direction: "downRight"
-})
+});
+test.subject.addSlantedModifier({
+	text: "quick",
+	label: "adjective",
+	direction: "downRight"
+});
 
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
