@@ -1,4 +1,4 @@
-const darkMode = false;
+const darkMode = true;
 const foregroundColor = darkMode ? "white" : "black";
 const canvasSize = [500, 300];
 const lineStyle = { width: 3, color: foregroundColor };
@@ -26,12 +26,14 @@ class Word {
 	 * @param {string} options.text
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
+	 * @param {object} [options.parent]
 	 */
 	constructor(options) {
 		this.origin = options.origin;
 		this.text = options.text;
 		this.label = options.label;
 		this.direction = options.direction;
+		this.parent = options.parent;
 
 		this.group = draw.group();
 		this.attachments = [];
@@ -102,6 +104,8 @@ class Word {
 		});
 		this.descenders.push(newWord);
 		this.render();
+		this.parent?.render();
+		
 		return newWord;
 	}
 	render() {
@@ -115,11 +119,7 @@ class Word {
 
 		this.transformGroup();
 
-		// reset attachpoints
-		this.attachments = [];
-		// add descender groups to parent group
 		this.descenders.forEach(descender => {
-			const attachPoint = this.newAttachment();
 			this.group.add(descender.group)
 		})
 	}
@@ -138,23 +138,33 @@ class Sentence {
 		this.verbText = options.verb;
 		this.direction = options.direction;
 		this.origin = options.origin || new Point(10, 40);
-
 		this.group = draw.group();
+
 		this.subject = new Word({
 			origin: this.origin,
 			text: this.subjectText,
 			label: "subject",
-			direction: this.direction
+			direction: this.direction,
+			parent: this,
 		});
-		var subjectVerbDivider = this.drawSubjectVerbDivider();
 		this.verb = new Word({
 			origin: new Point(this.proceedInSentenceDirection(this.origin.x, this.subject.group.width()), this.origin.y),
 			text: this.verbText,
 			label: "verb",
-			direction: this.direction
-		})
+			direction: this.direction,
+			parent: this,
+		});
+
+		this.render();
+	}
+
+	render() {
+		this.group.remove();
+		this.group = draw.group();
+
+		this.subjectVerbDivider = this.drawSubjectVerbDivider();
 		this.group.add(this.subject.group);
-		this.group.add(subjectVerbDivider);
+		this.group.add(this.subjectVerbDivider);
 		this.group.add(this.verb.group);
 	}
 
@@ -187,6 +197,7 @@ var test = new Sentence({
 	subject: "fox",
 	verb: "jumps",
 	direction: "right",
+	origin: new Point(100, 100)
 });
 test.subject.addSlantedModifier({
 	text: "the",
@@ -199,6 +210,17 @@ test.subject.addSlantedModifier({
 	direction: "downRight"
 });
 
+// var subject = new Word({
+// 	origin: new Point(100, 100),
+// 	text: "subject",
+// 	label: "",
+// 	direction: "right"
+// })
+// subject.addSlantedModifier({
+// 	text: "one",
+// 	label: "",
+// 	direction: "downRight"
+// })
 
 var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
 // @ts-ignore
