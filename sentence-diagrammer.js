@@ -55,7 +55,7 @@ class Word {
 	calcLength() {
 		var extraSpaceForDescenders = 0;
 		if (this.descenders.length > 1) {
-			extraSpaceForDescenders = (this.descenders.length - 1) * 40;
+			extraSpaceForDescenders = (this.descenders.length - 1) * 50;
 		}
 		return this.wordSvg.length() + 40 + extraSpaceForDescenders;
 	}
@@ -139,6 +139,7 @@ class Sentence {
 		this.direction = options.direction;
 		this.origin = options.origin || new Point(10, 40);
 		this.group = draw.group();
+		this.sentenceDividerX = 0; // sentence divider distance from left edge
 
 		this.subject = new Word({
 			origin: this.origin,
@@ -163,6 +164,8 @@ class Sentence {
 		this.group = draw.group();
 
 		this.subjectVerbDivider = this.drawSubjectVerbDivider();
+		this.verb.origin = new Point(this.sentenceDividerX, this.origin.y);
+		this.verb.render();
 		this.group.add(this.subject.group);
 		this.group.add(this.subjectVerbDivider);
 		this.group.add(this.verb.group);
@@ -184,10 +187,13 @@ class Sentence {
 	}
 
 	drawSubjectVerbDivider() {
-		let x = this.proceedInSentenceDirection(this.origin.x, this.subject.group.width());
+		this.sentenceDividerX = this.proceedInSentenceDirection(this.origin.x, this.subject.group.width());
 		let startY = this.origin.y - 30;
 		let endY = this.origin.y + 20;
-		const subjectVerbDivider = draw.line(x, startY, x, endY).stroke(lineStyle);
+		const subjectVerbDivider = draw.line(
+			this.sentenceDividerX, startY, 
+			this.sentenceDividerX, endY
+		).stroke(lineStyle);
 		return subjectVerbDivider;
 	}
 
@@ -206,6 +212,11 @@ test.subject.addSlantedModifier({
 });
 test.subject.addSlantedModifier({
 	text: "quick",
+	label: "adjective",
+	direction: "downRight"
+});
+test.subject.addSlantedModifier({
+	text: "brown",
 	label: "adjective",
 	direction: "downRight"
 });
