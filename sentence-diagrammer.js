@@ -16,13 +16,14 @@ class Point {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+		this.xy = [x, y];
 	}
 }
 
 class Word {
 	/**
 	 * @param {object} options
-	 * @param {Point} options.origin
+	 * @param {Point} options.origin For LTR words this will be the left edge; for RTL words it will be the right edge.
 	 * @param {string} options.text
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
@@ -38,19 +39,33 @@ class Word {
 		this.group = draw.group();
 		this.attachments = [];
 		this.descenders = [];
+		this.debug = false;
 
 		this.render();
 	}
 	createLine() {
 		this.length = this.calcLength();
 		this.lineEndpoint = this.calcLineEndpoint();
+
 		return draw.line(
 			0, 0,
-			this.lineEndpoint.x, this.lineEndpoint.y
+			...this.lineEndpoint.xy,
 		).stroke(lineStyle);
 	}
 	createWordSvg() {
-		return draw.text(this.text).attr({ x: 20, y: -38 }).font(textFont);
+		var attributes = {};
+		if (this.direction == "right") {
+			attributes = {
+				x: 20, y: -38,
+				direction: "ltr"
+			}
+		} else if (this.direction == "left") {
+			attributes = {
+				x: -20, y: -38,
+				direction: "rtl"
+			}
+		} else throw new Error("Invalid sentence direction " + this.direction); // TODO: Add diagonal word directionalities
+		return draw.text(this.text).attr(attributes).font(textFont);
 	}
 	calcLength() {
 		var extraSpaceForDescenders = 0;
@@ -122,6 +137,10 @@ class Word {
 		this.descenders.forEach(descender => {
 			this.group.add(descender.group)
 		})
+
+		if (this.debug == true) {
+			var originLabel = draw.text('O').move(this.origin.x - 6, this.origin.y - 6).fill('silver')
+		}
 	}
 }
 
@@ -130,8 +149,8 @@ class Sentence {
 	 * @param {object} options 
 	 * @param {string} options.subject
 	 * @param {string} options.verb
-	 * @param {string} options.direction
-	 * @param {Point} [options.origin]
+	 * @param {string} options.direction Either "left" or "right", for LTR and RTL sentences respectively.
+	 * @param {Point} [options.origin] Baseline of the text. For LTR sentences this will be at the text's left edge; for RTL sentences it will be at the right edge.
 	 */
 	constructor(options) {
 		this.subjectText = options.subject;
@@ -140,6 +159,7 @@ class Sentence {
 		this.origin = options.origin || new Point(10, 40);
 		this.group = draw.group();
 		this.sentenceDividerX = 0; // sentence divider distance from left edge
+		this.debug = false;
 
 		this.subject = new Word({
 			origin: this.origin,
@@ -164,11 +184,14 @@ class Sentence {
 		this.group = draw.group();
 
 		this.subjectVerbDivider = this.drawSubjectVerbDivider();
-		this.verb.origin = new Point(this.sentenceDividerX, this.origin.y);
 		this.verb.render();
 		this.group.add(this.subject.group);
 		this.group.add(this.subjectVerbDivider);
 		this.group.add(this.verb.group);
+
+		if (this.debug) {
+			var originLabel = draw.text('O').move(this.origin.x - 6, this.origin.y - 6).fill('silver')
+		}
 	}
 
 	/**
@@ -199,27 +222,40 @@ class Sentence {
 
 }
 
-var test = new Sentence({
-	subject: "fox",
-	verb: "jumps",
-	direction: "right",
-	origin: new Point(100, 100)
+var rtlSentence = new Sentence({
+	subject: "אַ֥שְֽׁרֵי",
+	verb: "הָלַךְ֮",
+	direction: "left",
+	origin: new Point(200, 100)
 });
-test.subject.addSlantedModifier({
-	text: "the",
-	label: "article",
-	direction: "downRight"
-});
-test.subject.addSlantedModifier({
-	text: "quick",
-	label: "adjective",
-	direction: "downRight"
-});
-test.subject.addSlantedModifier({
-	text: "brown",
-	label: "adjective",
-	direction: "downRight"
-});
+// FIXME
+// rtlSentence.subject.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downRight"
+// })
+
+// var test = new Sentence({
+// 	subject: "fox",
+// 	verb: "jumps",
+// 	direction: "right",
+// 	origin: new Point(100, 100)
+// });
+// test.subject.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downRight"
+// });
+// test.subject.addSlantedModifier({
+// 	text: "quick",
+// 	label: "adjective",
+// 	direction: "downRight"
+// });
+// test.subject.addSlantedModifier({
+// 	text: "brown",
+// 	label: "adjective",
+// 	direction: "downRight"
+// });
 
 // var subject = new Word({
 // 	origin: new Point(100, 100),
