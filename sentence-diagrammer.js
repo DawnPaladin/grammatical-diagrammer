@@ -20,6 +20,30 @@ class Point {
 	}
 }
 
+/**
+ * If object.direction is "right" or "downRight", runs the first function; if it's "left" or "downLeft", runs the second function; otherwise throws error.
+ * @param {object} object 
+ * @param {*} ifRight 
+ * @param {*} ifLeft 
+ * @returns {any}
+ */
+function rightOrLeft(object, ifRight, ifLeft) {
+	if (object.direction == "right" || object.direction == "downRight") return ifRight();
+	else if (object.direction == "left" || object.direction == "downLeft") return ifLeft();
+	else throw new Error("Invalid direction");
+}
+
+/**
+ * If word/sentence is LTR, returns true; if RTL, returns false; otherwise throws error. Useful for assigning things using the ternary operator, like so:
+ * var x = isRightPointing(word) ? 1 : -1;
+ * Thus, if word is LTR, x = 1; if it's RTL, x = -1.
+ * @param {object} object 
+ * @returns {boolean}
+ */
+function isRightPointing(object) {
+	return rightOrLeft(object, () => true, () => false);
+}
+
 class Word {
 	/**
 	 * @param {object} options
@@ -28,6 +52,7 @@ class Word {
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
 	 * @param {object} [options.parent]
+	 * @param {boolean} [options.debug] Highlight origin
 	 */
 	constructor(options) {
 		this.origin = options.origin;
@@ -35,11 +60,11 @@ class Word {
 		this.label = options.label;
 		this.direction = options.direction;
 		this.parent = options.parent;
+		this.debug = options.debug;
 
 		this.group = draw.group();
 		this.attachments = [];
 		this.descenders = [];
-		this.debug = false;
 
 		this.render();
 	}
@@ -53,18 +78,13 @@ class Word {
 		).stroke(lineStyle);
 	}
 	createWordSvg() {
-		var attributes = {};
-		if (this.direction == "right") {
-			attributes = {
-				x: 20, y: -38,
-				direction: "ltr"
-			}
-		} else if (this.direction == "left") {
-			attributes = {
-				x: -20, y: -38,
-				direction: "rtl"
-			}
-		} else throw new Error("Invalid sentence direction " + this.direction); // TODO: Add diagonal word directionalities
+		var attributes = isRightPointing(this) ? {
+			x: 20, y: -38,
+			direction: "ltr"
+		} : {
+			x: -20, y: -38,
+			direction: "rtl"
+		};
 		return draw.text(this.text).attr(attributes).font(textFont);
 	}
 	calcLength() {
@@ -75,30 +95,19 @@ class Word {
 		return this.wordSvg.length() + 40 + extraSpaceForDescenders;
 	}
 	calcLineEndpoint() {
-		var x;
-		switch (this.direction) {
-			case 'left':
-			case 'downLeft':
-				x = 0 - this.length;
-				break;
-			case 'right':
-			case 'downRight':
-				x = 0 + this.length;
-				break;
-			default:
-				throw new Error("Can't calculate line endpoint - invalid direction");
-		}
+		var x = isRightPointing(this) ? 0 + this.length : 0 - this.length;
 		var y = 0;
 		return new Point(x, y);
 	}
 	transformGroup() {
 		let transformation = { translateX: this.origin.x, translateY: this.origin.y };
 		if (this.direction == "downRight") transformation = {...transformation, rotate: 60, origin: "bottom left" };
-		if (this.direction == "downLeft" ) transformation = {...transformation, rotate: -60, origin: "top right" };
+		if (this.direction == "downLeft" ) transformation = {...transformation, rotate: -60, origin: "bottom right" };
 		this.group.transform(transformation);
 	}
 	newAttachment() {
-		const attachPoint = new Point(20 + this.attachments.length * descenderOffset, 0);
+		var offset = isRightPointing(this) ? 20 : -20;
+		const attachPoint = new Point(offset + this.attachments.length * descenderOffset, 0);
 		this.attachments.push(attachPoint);
 		return attachPoint;
 	}
@@ -126,6 +135,7 @@ class Word {
 	render() {
 		this.group.remove();
 		this.group = draw.group();
+		this.group.addClass('word')
 		this.wordSvg = this.createWordSvg();
 		this.line = this.createLine();
 
@@ -139,7 +149,8 @@ class Word {
 		})
 
 		if (this.debug == true) {
-			var originLabel = draw.text('O').move(this.origin.x - 6, this.origin.y - 6).fill('silver')
+			var originLabel = draw.text('O').cx(0).cy(0).fill('silver').addClass(`word-${this.text}-origin`);
+			this.group.add(originLabel)
 		}
 	}
 }
@@ -151,15 +162,16 @@ class Sentence {
 	 * @param {string} options.verb
 	 * @param {string} options.direction Either "left" or "right", for LTR and RTL sentences respectively.
 	 * @param {Point} [options.origin] Baseline of the text. For LTR sentences this will be at the text's left edge; for RTL sentences it will be at the right edge.
+	 * @param {boolean} [options.debug] Highlight origin
 	 */
 	constructor(options) {
 		this.subjectText = options.subject;
 		this.verbText = options.verb;
 		this.direction = options.direction;
 		this.origin = options.origin || new Point(10, 40);
+		this.debug = options.debug;
 		this.group = draw.group();
 		this.sentenceDividerX = 0; // sentence divider distance from left edge
-		this.debug = false;
 
 		this.subject = new Word({
 			origin: this.origin,
@@ -182,15 +194,18 @@ class Sentence {
 	render() {
 		this.group.remove();
 		this.group = draw.group();
+		this.group.addClass('sentence')
 
 		this.subjectVerbDivider = this.drawSubjectVerbDivider();
+		this.verb.origin = new Point(this.sentenceDividerX, this.origin.y); // position the verb on the other side of the sentence divider
 		this.verb.render();
 		this.group.add(this.subject.group);
 		this.group.add(this.subjectVerbDivider);
 		this.group.add(this.verb.group);
 
 		if (this.debug) {
-			var originLabel = draw.text('O').move(this.origin.x - 6, this.origin.y - 6).fill('silver')
+			var originLabel = draw.text('O').move(this.origin.x - 6, this.origin.y - 6).fill('silver').addClass(`sentence-origin`);
+			this.group.add(originLabel);
 		}
 	}
 
@@ -200,13 +215,11 @@ class Sentence {
 	 * @param {number} b
 	 */
 	proceedInSentenceDirection(a, b) {
-		if (this.direction == "right") {
+		return rightOrLeft(this, function() {
 			return a + b;
-		} else if (this.direction == "left") {
+		}, function() {
 			return a - b;
-		} else {
-			throw new Error("Invalid sentence direction " + this.direction);
-		}
+		})
 	}
 
 	drawSubjectVerbDivider() {
@@ -228,34 +241,33 @@ var rtlSentence = new Sentence({
 	direction: "left",
 	origin: new Point(200, 100)
 });
-// FIXME
-// rtlSentence.subject.addSlantedModifier({
-// 	text: "the",
-// 	label: "article",
-// 	direction: "downRight"
-// })
+rtlSentence.subject.addSlantedModifier({
+	text: "אַ֥שְֽׁרֵי",
+	label: "article",
+	direction: "downLeft"
+})
 
-// var test = new Sentence({
-// 	subject: "fox",
-// 	verb: "jumps",
-// 	direction: "right",
-// 	origin: new Point(100, 100)
-// });
-// test.subject.addSlantedModifier({
-// 	text: "the",
-// 	label: "article",
-// 	direction: "downRight"
-// });
-// test.subject.addSlantedModifier({
-// 	text: "quick",
-// 	label: "adjective",
-// 	direction: "downRight"
-// });
-// test.subject.addSlantedModifier({
-// 	text: "brown",
-// 	label: "adjective",
-// 	direction: "downRight"
-// });
+var test = new Sentence({
+	subject: "fox",
+	verb: "jumps",
+	direction: "right",
+	origin: new Point(100, 200)
+});
+test.subject.addSlantedModifier({
+	text: "the",
+	label: "article",
+	direction: "downRight"
+});
+test.subject.addSlantedModifier({
+	text: "quick",
+	label: "adjective",
+	direction: "downRight"
+});
+test.subject.addSlantedModifier({
+	text: "brown",
+	label: "adjective",
+	direction: "downRight"
+});
 
 // var subject = new Word({
 // 	origin: new Point(100, 100),
