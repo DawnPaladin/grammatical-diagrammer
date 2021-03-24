@@ -1,6 +1,6 @@
 const darkMode = true;
 const foregroundColor = darkMode ? "white" : "black";
-const canvasSize = [500, 300];
+const canvasSize = [500, 500];
 const lineStyle = { width: 3, color: foregroundColor };
 const textFont = { size: 24, fill: foregroundColor };
 const labelFont = { size: 24, fill: "blue" };
@@ -42,6 +42,14 @@ function rightOrLeft(object, ifRight, ifLeft) {
  */
 function isRightPointing(object) {
 	return rightOrLeft(object, () => true, () => false);
+}
+/**
+ * Opposite of isRightPointing.
+ * @param {object} object 
+ * @returns {boolean}
+ */
+ function isLeftPointing(object) {
+	return !isRightPointing(object);
 }
 
 class Word {
@@ -92,6 +100,9 @@ class Word {
 		if (this.descenders.length > 1) {
 			extraSpaceForDescenders = (this.descenders.length - 1) * 50;
 		}
+		if (this.hasAttachedPhrase == true) { // If this is a diagonal line with a horizontal phrase attached to it, it will need more space.
+			extraSpaceForDescenders += 20;
+		}
 		return this.wordSvg.length() + 40 + extraSpaceForDescenders;
 	}
 	calcLineEndpoint() {
@@ -101,36 +112,33 @@ class Word {
 	}
 	transformGroup() {
 		let transformation = { translateX: this.origin.x, translateY: this.origin.y };
-		if (this.direction == "downRight") transformation = {...transformation, rotate: 60, origin: "bottom left" };
-		if (this.direction == "downLeft" ) transformation = {...transformation, rotate: -60, origin: "bottom right" };
+
+		// if the line should be diagonal, rotate it downward
+		if (this.direction == "downRight") {
+			transformation = {...transformation, rotate: 60, origin: "bottom left" };
+		}
+		if (this.direction == "downLeft" ) {
+			transformation = {...transformation, rotate: -60, origin: "bottom right" };
+		}
+		// if the line's parent is diagonal but it should be horizontal, rotate it back
+		if (this.direction == "right" && this.parent && this.parent.direction == "downRight") {
+			transformation = {...transformation, rotate: -60, origin: "bottom left" };
+		}
+		if (this.direction == "left" && this.parent && this.parent.direction == "downLeft") {
+			transformation = {...transformation, rotate: 60, origin: "bottom left" };
+		}
 		this.group.transform(transformation);
 	}
 	newAttachment() {
 		var offset = isRightPointing(this) ? 20 : -20;
-		const attachPoint = new Point(offset + this.attachments.length * descenderOffset, 0);
+		var attachPointX = offset + this.attachments.length * descenderOffset;
+		if (this.direction == "downRight" || this.direction == "downLeft") {
+			attachPointX = this.calcLength() - attachPointX; // attach to the right end instead of the left
+		}
+		var attachPoint = new Point(attachPointX, 0);
+
 		this.attachments.push(attachPoint);
 		return attachPoint;
-	}
-	/**
-	 * @param {object} options 
-	 * @param {string} options.text
-	 * @param {string} options.label
-	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
-	 * @returns {Word}
-	 */
-	addSlantedModifier(options) {
-		const attachPoint = this.newAttachment();
-		const newWord = new Word({
-			origin: attachPoint,
-			text: options.text,
-			label: options.label,
-			direction: options.direction
-		});
-		this.descenders.push(newWord);
-		this.render();
-		this.parent?.render();
-		
-		return newWord;
 	}
 	render() {
 		this.group.remove();
@@ -152,6 +160,44 @@ class Word {
 			var originLabel = draw.text('O').cx(0).cy(0).fill('silver').addClass(`word-${this.text}-origin`);
 			this.group.add(originLabel)
 		}
+	}
+
+	// Public API
+
+	/**
+	 * For adjectives, adverbs, prepositions
+	 * @param {object} options 
+	 * @param {string} options.text
+	 * @param {string} options.label
+	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
+	 * @returns {Word}
+	 */
+	 addSlantedModifier(options) {
+		const attachPoint = this.newAttachment();
+		const newWord = new Word({
+			origin: attachPoint,
+			text: options.text,
+			label: options.label,
+			direction: options.direction,
+			parent: this,
+		});
+		this.descenders.push(newWord);
+		this.recursiveRender(this);
+		
+		return newWord;
+	}
+
+	recursiveRender(object) {
+		object.render();
+		if (object.parent) {
+			object.recursiveRender(object.parent)
+		}
+	}
+
+	// For objects of prepositions
+	addPhrase(options) {
+		this.hasAttachedPhrase = true;
+		return this.addSlantedModifier(options);
 	}
 }
 
@@ -235,23 +281,23 @@ class Sentence {
 
 }
 
-var rtlSentence = new Sentence({
-	subject: "אַ֥שְֽׁרֵי",
-	verb: "הָלַךְ֮",
-	direction: "left",
-	origin: new Point(200, 100)
-});
-rtlSentence.subject.addSlantedModifier({
-	text: "אַ֥שְֽׁרֵי",
-	label: "article",
-	direction: "downLeft"
-})
+// var rtlSentence = new Sentence({
+// 	subject: "אַ֥שְֽׁרֵי",
+// 	verb: "הָלַךְ֮",
+// 	direction: "left",
+// 	origin: new Point(200, 100)
+// });
+// rtlSentence.subject.addSlantedModifier({
+// 	text: "אַ֥שְֽׁרֵי",
+// 	label: "article",
+// 	direction: "downLeft"
+// })
 
 var test = new Sentence({
 	subject: "fox",
 	verb: "jumps",
 	direction: "right",
-	origin: new Point(100, 200)
+	origin: new Point(10, 100)
 });
 test.subject.addSlantedModifier({
 	text: "the",
@@ -268,6 +314,26 @@ test.subject.addSlantedModifier({
 	label: "adjective",
 	direction: "downRight"
 });
+var preposition = test.verb.addSlantedModifier({
+	text: "over",
+	label: "preposition",
+	direction: "downRight"
+});
+var prepPhrase = preposition.addPhrase({
+	text: "dog",
+	label: "noun",
+	direction: "right",
+})
+prepPhrase.addSlantedModifier({
+	text: "the",
+	label: "article",
+	direction: "downRight"
+})
+prepPhrase.addSlantedModifier({
+	text: "lazy",
+	label: "adjective",
+	direction: "downRight"
+})
 
 // var subject = new Word({
 // 	origin: new Point(100, 100),
