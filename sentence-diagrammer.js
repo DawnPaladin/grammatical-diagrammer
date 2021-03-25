@@ -1,4 +1,4 @@
-const darkMode = true;
+const darkMode = false;
 const foregroundColor = darkMode ? "white" : "black";
 const canvasSize = [500, 500];
 const lineStyle = { width: 3, color: foregroundColor };
