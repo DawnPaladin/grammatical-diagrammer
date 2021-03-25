@@ -2,25 +2,9 @@
 <script src="svg.js"></script>
 <body>
 
-<label><input type="checkbox" id="show-labels-checkbox" checked>Show labels</label>
-
 <div id="canvas"></div>
 <a href="#" id="download-link" download="diagram.svg">Download</a>
 
 <script src="sentence-diagrammer.js"></script>
-<script>
-	document.getElementById("show-labels-checkbox").addEventListener('click', event => {
-		var labels = document.getElementsByClassName("label");
-		if (event.target.checked == true) {
-			labels.forEach(label => {
-				label.style.visibility = "visible"
-			})
-		} else {
-			labels.forEach(label => {
-				label.style.visibility = "hidden"
-			})
-		}
-	})
-</script>
 
 </body>

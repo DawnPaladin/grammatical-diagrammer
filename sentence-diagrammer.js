@@ -6,7 +6,7 @@ const textFont = { size: 24, fill: foregroundColor };
 const labelFont = { size: 24, fill: "blue" };
 const descenderOffset = 45; // distance between descender attachment points
 
-var draw = SVG().addTo('#canvas').size(...canvasSize);
+const draw = SVG().addTo('#canvas').size(...canvasSize);
 
 class Point {
 	/**
@@ -93,7 +93,8 @@ class Word {
 			x: -20, y: -38,
 			direction: "rtl"
 		};
-		return draw.text(this.text).attr(attributes).font(textFont);
+		var label = draw.element('title').words(this.label);
+		return draw.text(this.text).attr(attributes).font(textFont).add(label);
 	}
 	calcLength() {
 		var extraSpaceForDescenders = 0;
@@ -286,61 +287,93 @@ class Sentence {
 
 }
 
-// var rtlSentence = new Sentence({
-// 	subject: "אַ֥שְֽׁרֵי",
-// 	verb: "הָלַךְ֮",
-// 	direction: "left",
-// 	origin: new Point(200, 100)
-// });
-// rtlSentence.subject.addSlantedModifier({
-// 	text: "אַ֥שְֽׁרֵי",
-// 	label: "article",
-// 	direction: "downLeft"
-// })
-
-var test = new Sentence({
+var ltrSentence = new Sentence({
 	subject: "fox",
 	verb: "jumps",
-	direction: "left",
-	origin: new Point(500, 50)
+	direction: "right",
+	origin: new Point(10, 50)
 });
-test.subject.addSlantedModifier({
+ltrSentence.subject.addSlantedModifier({
 	text: "the",
 	label: "article",
-	direction: "downLeft"
+	direction: "downRight"
 });
-test.subject.addSlantedModifier({
+ltrSentence.subject.addSlantedModifier({
 	text: "quick",
 	label: "adjective",
-	direction: "downLeft"
+	direction: "downRight"
 });
-test.subject.addSlantedModifier({
+ltrSentence.subject.addSlantedModifier({
 	text: "brown",
 	label: "adjective",
-	direction: "downLeft"
+	direction: "downRight"
 });
-var preposition = test.verb.addSlantedModifier({
+var preposition = ltrSentence.verb.addSlantedModifier({
 	text: "over",
 	label: "preposition",
-	direction: "downLeft",
+	direction: "downRight",
 	// debug: true
 });
 var prepPhrase = preposition.addPhrase({
 	text: "dog",
 	label: "noun",
-	direction: "left",
+	direction: "right",
 	// debug: true
 })
 prepPhrase.addSlantedModifier({
 	text: "the",
 	label: "article",
-	direction: "downLeft"
+	direction: "downRight"
 })
 prepPhrase.addSlantedModifier({
 	text: "lazy",
 	label: "adjective",
-	direction: "downLeft"
+	direction: "downRight"
 })
+
+// var rtlSentence = new Sentence({
+// 	subject: "fox",
+// 	verb: "jumps",
+// 	direction: "left",
+// 	origin: new Point(500, 50)
+// });
+// rtlSentence.subject.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downLeft"
+// });
+// rtlSentence.subject.addSlantedModifier({
+// 	text: "quick",
+// 	label: "adjective",
+// 	direction: "downLeft"
+// });
+// rtlSentence.subject.addSlantedModifier({
+// 	text: "brown",
+// 	label: "adjective",
+// 	direction: "downLeft"
+// });
+// var preposition = rtlSentence.verb.addSlantedModifier({
+// 	text: "over",
+// 	label: "preposition",
+// 	direction: "downLeft",
+// 	// debug: true
+// });
+// var prepPhrase = preposition.addPhrase({
+// 	text: "dog",
+// 	label: "noun",
+// 	direction: "left",
+// 	// debug: true
+// })
+// prepPhrase.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downLeft"
+// })
+// prepPhrase.addSlantedModifier({
+// 	text: "lazy",
+// 	label: "adjective",
+// 	direction: "downLeft"
+// })
 
 // var subject = new Word({
 // 	origin: new Point(100, 100),
