@@ -125,18 +125,22 @@ class Word {
 			transformation = {...transformation, rotate: -60, origin: "bottom left" };
 		}
 		if (this.direction == "left" && this.parent && this.parent.direction == "downLeft") {
-			transformation = {...transformation, rotate: 60, origin: "bottom left" };
+			transformation = {translateX: -this.origin.x, translateY: -this.origin.y, rotate: 60, origin: "bottom right" };
 		}
 		this.group.transform(transformation);
 	}
 	newAttachment() {
-		var offset = isRightPointing(this) ? 20 : -20;
-		var attachPointX = offset + this.attachments.length * descenderOffset;
+		// don't conditionalize this - the downRight/downLeft conditional expects it
+		var attachPointX = 20 + this.attachments.length * descenderOffset;
+
+		if (this.direction == "left") {
+			attachPointX = -20 - this.attachments.length * descenderOffset;
+		}
 		if (this.direction == "downRight" || this.direction == "downLeft") {
 			attachPointX = this.calcLength() - attachPointX; // attach to the right end instead of the left
 		}
-		var attachPoint = new Point(attachPointX, 0);
 
+		var attachPoint = new Point(attachPointX, 0);
 		this.attachments.push(attachPoint);
 		return attachPoint;
 	}
@@ -161,6 +165,12 @@ class Word {
 			this.group.add(originLabel)
 		}
 	}
+	recursiveRender(object) {
+		object.render();
+		if (object.parent) {
+			object.recursiveRender(object.parent)
+		}
+	}
 
 	// Public API
 
@@ -170,6 +180,7 @@ class Word {
 	 * @param {string} options.text
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
+	 * @param {boolean} [options.debug]
 	 * @returns {Word}
 	 */
 	 addSlantedModifier(options) {
@@ -179,19 +190,13 @@ class Word {
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
+			debug: options.debug,
 			parent: this,
 		});
 		this.descenders.push(newWord);
 		this.recursiveRender(this);
 		
 		return newWord;
-	}
-
-	recursiveRender(object) {
-		object.render();
-		if (object.parent) {
-			object.recursiveRender(object.parent)
-		}
 	}
 
 	// For objects of prepositions
@@ -296,43 +301,45 @@ class Sentence {
 var test = new Sentence({
 	subject: "fox",
 	verb: "jumps",
-	direction: "right",
-	origin: new Point(10, 100)
+	direction: "left",
+	origin: new Point(500, 50)
 });
 test.subject.addSlantedModifier({
 	text: "the",
 	label: "article",
-	direction: "downRight"
+	direction: "downLeft"
 });
 test.subject.addSlantedModifier({
 	text: "quick",
 	label: "adjective",
-	direction: "downRight"
+	direction: "downLeft"
 });
 test.subject.addSlantedModifier({
 	text: "brown",
 	label: "adjective",
-	direction: "downRight"
+	direction: "downLeft"
 });
 var preposition = test.verb.addSlantedModifier({
 	text: "over",
 	label: "preposition",
-	direction: "downRight"
+	direction: "downLeft",
+	// debug: true
 });
 var prepPhrase = preposition.addPhrase({
 	text: "dog",
 	label: "noun",
-	direction: "right",
+	direction: "left",
+	// debug: true
 })
 prepPhrase.addSlantedModifier({
 	text: "the",
 	label: "article",
-	direction: "downRight"
+	direction: "downLeft"
 })
 prepPhrase.addSlantedModifier({
 	text: "lazy",
 	label: "adjective",
-	direction: "downRight"
+	direction: "downLeft"
 })
 
 // var subject = new Word({
