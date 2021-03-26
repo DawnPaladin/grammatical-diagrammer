@@ -97,14 +97,27 @@ class Word {
 		return draw.text(this.text).attr(attributes).font(textFont).add(label);
 	}
 	calcLength() {
-		var extraSpaceForDescenders = 0;
+		var wordWidth = this.wordSvg.length() + 40;
+		var descendersWidth = 0;
+		// add space for each descender
+		this.descenders.forEach(descender => {
+			if (descender.direction == "downLeft" || descender.direction == "downRight") {
+				descendersWidth += 40;
+			}
+		})
+		// the last descender especially extends the width of its parent
 		if (this.descenders.length > 1) {
-			extraSpaceForDescenders = (this.descenders.length - 1) * 50;
+			var lastDescender = this.descenders[this.descenders.length - 1];
+			if (lastDescender.direction == "downLeft" || lastDescender.direction == "downRight") {
+				descendersWidth += lastDescender.length * .7;
+			}
 		}
-		if (this.hasAttachedPhrase == true) { // If this is a diagonal line with a horizontal phrase attached to it, it will need more space.
-			extraSpaceForDescenders += 20;
+		// if this is a diagonal line with a horizontal phrase attached to it, it will need more space
+		if (this.hasAttachedPhrase == true) {
+			descendersWidth += 20;
+			wordWidth += 20;
 		}
-		return this.wordSvg.length() + 40 + extraSpaceForDescenders;
+		return Math.max(wordWidth, descendersWidth);
 	}
 	calcLineEndpoint() {
 		var x = isRightPointing(this) ? 0 + this.length : 0 - this.length;
@@ -335,7 +348,7 @@ prepPhrase.addSlantedModifier({
 // 	subject: "fox",
 // 	verb: "jumps",
 // 	direction: "left",
-// 	origin: new Point(500, 50)
+// 	origin: new Point(500, 250)
 // });
 // rtlSentence.subject.addSlantedModifier({
 // 	text: "the",
