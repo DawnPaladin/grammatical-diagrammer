@@ -6,7 +6,42 @@ const textFont = { size: 24, fill: foregroundColor };
 const labelFont = { size: 24, fill: "blue" };
 const descenderOffset = 45; // distance between descender attachment points
 
-const draw = SVG().addTo('#canvas').size(...canvasSize);
+// @ts-ignore
+const { createSVGWindow } = require('svgdom');
+const window = createSVGWindow();
+const document = window.document;
+// @ts-ignore
+const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+registerWindow(window, document);
+
+// @ts-ignore
+const draw = SVG(document.element).size(...canvasSize);
+
+const fs = require('fs');
+
+var xml = `
+<GrammaticalDiagram>
+	<BaselineGroup>
+		<Baseline topOffset="20px" rightOffset="20px">
+			<Slot1>
+				<UnderstraightGroup>
+					<Word text="the fox" />
+					<Word text="quick brown" />
+				</UnderstraightGroup>
+			</Slot1>
+			<Slot2>
+				<Word text="jumps" />
+				<Underslant>
+					<UnderstraightGroup>
+						<Word text="over the dog" />
+						<Word text="lazy" />
+					</UnderstraightGroup>
+				</Underslant>
+			</Slot2>
+		</Baseline>
+	</BaselineGroup>
+</GrammaticalDiagram>`;
+
 
 class Point {
 	/**
@@ -93,8 +128,8 @@ class Word {
 			x: -20, y: -38,
 			direction: "rtl"
 		};
-		var label = draw.element('title').words(this.label);
-		return draw.text(this.text).attr(attributes).font(textFont).add(label);
+		// var label = draw.element('title').words(this.label); // FIXME: Title elements break jsdom
+		return draw.text(this.text).attr(attributes).font(textFont)//.add(label);
 	}
 	calcLength() {
 		var wordWidth = this.wordSvg.length() + 40;
@@ -390,16 +425,15 @@ prepPhrase.addSlantedModifier({
 
 // var subject = new Word({
 // 	origin: new Point(100, 100),
-// 	text: "subject",
-// 	label: "",
+// 	text: "fox",
+// 	label: "noun",
 // 	direction: "right"
 // })
 // subject.addSlantedModifier({
-// 	text: "one",
-// 	label: "",
+// 	text: "lazy",
+// 	label: "adjective",
 // 	direction: "downRight"
 // })
 
-var url = "data:image/svg+xml,"+encodeURIComponent(draw.svg());
-// @ts-ignore
-document.getElementById('download-link').href = url;
+const svgString = draw.svg();
+fs.writeFileSync('diagram.svg', svgString);
