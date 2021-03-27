@@ -112,7 +112,6 @@ class Word {
 		this.render();
 	}
 	createLine() {
-		this.length = this.calcLength();
 		this.lineEndpoint = this.calcLineEndpoint();
 
 		return draw.line(
@@ -128,11 +127,13 @@ class Word {
 			x: -20, y: -38,
 			direction: "rtl"
 		};
-		// var label = draw.element('title').words(this.label); // FIXME: Title elements break jsdom
-		return draw.text(this.text).attr(attributes).font(textFont)//.add(label);
+		var text = draw.text(this.text).attr(attributes).font(textFont);
+		this.length = this.calcLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
+		var label = draw.element('title').words(this.label);
+		return text.add(label);
 	}
-	calcLength() {
-		var wordWidth = this.wordSvg.length() + 40;
+	calcLength(wordSvg) {
+		var wordWidth = wordSvg.length() + 40;
 		var descendersWidth = 0;
 		// add space for each descender
 		this.descenders.forEach(descender => {
@@ -186,7 +187,7 @@ class Word {
 			attachPointX = -20 - this.attachments.length * descenderOffset;
 		}
 		if (this.direction == "downRight" || this.direction == "downLeft") {
-			attachPointX = this.calcLength() - attachPointX; // attach to the right end instead of the left
+			attachPointX = this.length - attachPointX; // attach to the right end instead of the left
 		}
 
 		var attachPoint = new Point(attachPointX, 0);
@@ -323,7 +324,7 @@ class Sentence {
 	}
 
 	drawSubjectVerbDivider() {
-		this.sentenceDividerX = this.proceedInSentenceDirection(this.origin.x, this.subject.group.width());
+		this.sentenceDividerX = this.proceedInSentenceDirection(this.origin.x, this.subject.length);
 		let startY = this.origin.y - 30;
 		let endY = this.origin.y + 20;
 		const subjectVerbDivider = draw.line(
