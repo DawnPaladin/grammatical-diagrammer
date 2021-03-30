@@ -1,47 +1,10 @@
 const darkMode = false;
 const foregroundColor = darkMode ? "white" : "black";
-const canvasSize = [500, 500];
 const lineStyle = { width: 3, color: foregroundColor };
 const textFont = { size: 24, fill: foregroundColor };
-const labelFont = { size: 24, fill: "blue" };
 const descenderOffset = 45; // distance between descender attachment points
 
-// @ts-ignore
-const { createSVGWindow } = require('svgdom');
-const window = createSVGWindow();
-const document = window.document;
-// @ts-ignore
-const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-registerWindow(window, document);
-
-// @ts-ignore
-const draw = SVG(document.element).size(...canvasSize);
-
-const fs = require('fs');
-
-var xml = `
-<GrammaticalDiagram>
-	<BaselineGroup>
-		<Baseline topOffset="20px" rightOffset="20px">
-			<Slot1>
-				<UnderstraightGroup>
-					<Word text="the fox" />
-					<Word text="quick brown" />
-				</UnderstraightGroup>
-			</Slot1>
-			<Slot2>
-				<Word text="jumps" />
-				<Underslant>
-					<UnderstraightGroup>
-						<Word text="over the dog" />
-						<Word text="lazy" />
-					</UnderstraightGroup>
-				</Underslant>
-			</Slot2>
-		</Baseline>
-	</BaselineGroup>
-</GrammaticalDiagram>`;
-
+import draw from './svg-canvas.js';
 
 class Point {
 	/**
@@ -83,7 +46,7 @@ function isRightPointing(object) {
  * @param {object} object 
  * @returns {boolean}
  */
- function isLeftPointing(object) {
+	function isLeftPointing(object) {
 	return !isRightPointing(object);
 }
 
@@ -233,7 +196,7 @@ class Word {
 	 * @param {boolean} [options.debug]
 	 * @returns {Word}
 	 */
-	 addSlantedModifier(options) {
+		addSlantedModifier(options) {
 		const attachPoint = this.newAttachment();
 		const newWord = new Word({
 			origin: attachPoint,
@@ -336,105 +299,6 @@ class Sentence {
 
 }
 
-var ltrSentence = new Sentence({
-	subject: "fox",
-	verb: "jumps",
-	direction: "right",
-	origin: new Point(10, 50)
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "the",
-	label: "article",
-	direction: "downRight"
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "quick",
-	label: "adjective",
-	direction: "downRight"
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "brown",
-	label: "adjective",
-	direction: "downRight"
-});
-var preposition = ltrSentence.verb.addSlantedModifier({
-	text: "over",
-	label: "preposition",
-	direction: "downRight",
-	// debug: true
-});
-var prepPhrase = preposition.addPhrase({
-	text: "dog",
-	label: "noun",
-	direction: "right",
-	// debug: true
-})
-prepPhrase.addSlantedModifier({
-	text: "the",
-	label: "article",
-	direction: "downRight"
-})
-prepPhrase.addSlantedModifier({
-	text: "lazy",
-	label: "adjective",
-	direction: "downRight"
-})
+const saveAs = draw; // so we can do saveAs.svg()
 
-// var rtlSentence = new Sentence({
-// 	subject: "fox",
-// 	verb: "jumps",
-// 	direction: "left",
-// 	origin: new Point(500, 250)
-// });
-// rtlSentence.subject.addSlantedModifier({
-// 	text: "the",
-// 	label: "article",
-// 	direction: "downLeft"
-// });
-// rtlSentence.subject.addSlantedModifier({
-// 	text: "quick",
-// 	label: "adjective",
-// 	direction: "downLeft"
-// });
-// rtlSentence.subject.addSlantedModifier({
-// 	text: "brown",
-// 	label: "adjective",
-// 	direction: "downLeft"
-// });
-// var preposition = rtlSentence.verb.addSlantedModifier({
-// 	text: "over",
-// 	label: "preposition",
-// 	direction: "downLeft",
-// 	// debug: true
-// });
-// var prepPhrase = preposition.addPhrase({
-// 	text: "dog",
-// 	label: "noun",
-// 	direction: "left",
-// 	// debug: true
-// })
-// prepPhrase.addSlantedModifier({
-// 	text: "the",
-// 	label: "article",
-// 	direction: "downLeft"
-// })
-// prepPhrase.addSlantedModifier({
-// 	text: "lazy",
-// 	label: "adjective",
-// 	direction: "downLeft"
-// })
-
-// var subject = new Word({
-// 	origin: new Point(100, 100),
-// 	text: "fox",
-// 	label: "noun",
-// 	direction: "right"
-// })
-// subject.addSlantedModifier({
-// 	text: "lazy",
-// 	label: "adjective",
-// 	direction: "downRight"
-// })
-
-const svgString = draw.svg();
-fs.writeFileSync('diagram.svg', svgString);
+export { Point, Word, Sentence, saveAs };

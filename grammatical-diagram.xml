@@ -1,0 +1,17 @@
+<GrammaticalDiagram>
+	<Clause direction="right">
+		<Subject word="fox">
+			<Article word="the" />
+			<Adjective word="quick" />
+			<Adjective word="brown" />
+		</Subject>
+		<Verb word="jumps">
+			<Preposition word="over">
+				<Phrase word="dog" label="object of preposition">
+					<Article word="the" />
+					<Adjective word="lazy" />
+				</Phrase>
+			</Preposition>
+		</Verb>
+	</Clause>
+</GrammaticalDiagram>

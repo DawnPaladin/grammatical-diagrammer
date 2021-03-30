@@ -6,7 +6,8 @@
     "xml-js": "^1.6.11"
   },
   "scripts": {
-    "generate": "node sentence-diagrammer.js",
+    "generate": "node .",
     "dev": "light-server -s . -p 8080 -w '*.js, *.html # npm run generate'"
-  }
+  },
+  "type": "module"
 }
