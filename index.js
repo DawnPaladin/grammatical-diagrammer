@@ -1,48 +1,52 @@
 
-import { Point, Sentence as Clause, saveAs } from './draw.js';
+import { Point, Clause, saveAs } from './draw.js';
+import parseXML from './parse-xml.js';
 import fs from 'fs';
 
-var ltrSentence = new Clause({
-	subject: "fox",
-	verb: "jumps",
-	direction: "right",
-	origin: new Point(10, 50)
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "the",
-	label: "article",
-	direction: "downRight"
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "quick",
-	label: "adjective",
-	direction: "downRight"
-});
-ltrSentence.subject.addSlantedModifier({
-	text: "brown",
-	label: "adjective",
-	direction: "downRight"
-});
-var preposition = ltrSentence.verb.addSlantedModifier({
-	text: "over",
-	label: "preposition",
-	direction: "downRight",
-});
-var prepPhrase = preposition.addPhrase({
-	text: "dog",
-	label: "noun",
-	direction: "right",
-});
-prepPhrase.addSlantedModifier({
-	text: "the",
-	label: "article",
-	direction: "downRight"
-});
-prepPhrase.addSlantedModifier({
-	text: "lazy",
-	label: "adjective",
-	direction: "downRight"
-});
+const clauses = parseXML('./grammatical-diagram.xml');
+const diagrams = clauses.map(clauseObj => new Clause(clauseObj));
+
+// var ltrSentence = new Clause({
+// 	subject: "",
+// 	verb: "jumps",
+// 	direction: "right",
+// 	origin: new Point(10, 50)
+// });
+// ltrSentence.subject.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downRight"
+// });
+// ltrSentence.subject.addSlantedModifier({
+// 	text: "quick",
+// 	label: "adjective",
+// 	direction: "downRight"
+// });
+// ltrSentence.subject.addSlantedModifier({
+// 	text: "brown",
+// 	label: "adjective",
+// 	direction: "downRight"
+// });
+// var preposition = ltrSentence.verb.addSlantedModifier({
+// 	text: "over",
+// 	label: "preposition",
+// 	direction: "downRight",
+// });
+// var prepPhrase = preposition.addPhrase({
+// 	text: "dog",
+// 	label: "noun",
+// 	direction: "right",
+// });
+// prepPhrase.addSlantedModifier({
+// 	text: "the",
+// 	label: "article",
+// 	direction: "downRight"
+// });
+// prepPhrase.addSlantedModifier({
+// 	text: "lazy",
+// 	label: "adjective",
+// 	direction: "downRight"
+// });
 
 // var rtlSentence = new Clause({
 // 	subject: "fox",
