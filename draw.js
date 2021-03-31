@@ -219,7 +219,7 @@ class Word {
 	}
 }
 
-class Sentence {
+class Clause {
 	/**
 	 * @param {object} options 
 	 * @param {string} options.subject
@@ -301,4 +301,4 @@ class Sentence {
 
 const saveAs = draw; // so we can do saveAs.svg()
 
-export { Point, Word, Sentence, saveAs };
+export { Point, Word, Clause as Sentence, saveAs };

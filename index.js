@@ -1,12 +1,8 @@
 
-import { Point, Sentence, saveAs } from './draw.js';
+import { Point, Sentence as Clause, saveAs } from './draw.js';
 import fs from 'fs';
 
-const xml = fs.readFileSync('./grammatical-diagram.xml').toString();
-
-console.log(xml);
-
-var ltrSentence = new Sentence({
+var ltrSentence = new Clause({
 	subject: "fox",
 	verb: "jumps",
 	direction: "right",
@@ -48,7 +44,7 @@ prepPhrase.addSlantedModifier({
 	direction: "downRight"
 });
 
-// var rtlSentence = new Sentence({
+// var rtlSentence = new Clause({
 // 	subject: "fox",
 // 	verb: "jumps",
 // 	direction: "left",
