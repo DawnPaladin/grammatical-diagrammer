@@ -3,6 +3,9 @@ import convert from 'xml-js';
 import isRTL from './is-rtl.js';
 import { Word, Clause, rightOrLeft } from './draw.js';
 
+const slantedModifiers = ["article", "adjective", "adverb", "preposition"];
+const horizontals = ["phrase"];
+
 export default function(filePath) {
 	const xml = fs.readFileSync(filePath).toString();
 	const input = convert.xml2js(xml);
@@ -32,11 +35,20 @@ export default function(filePath) {
 	return clauseDiagrams;
 }
 
-function parseTag(tag, parent) {
-	var direction = tag.attributes.direction || rightOrLeft(parent, () => "downRight", () => "downLeft");
-	return parent.addSlantedModifier({
-		text: tag.attributes.word,
-		label: tag.attributes.label || tag.name,
-		direction
-	})
+function parseTag(tag, parentDiagram) {
+	var text = tag.attributes.word;
+	var label = tag.attributes.label || tag.name.toLowerCase();
+
+	if (slantedModifiers.includes(tag.name.toLowerCase())) {
+		var direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "downRight", () => "downLeft");
+		var diagrammedTag = parentDiagram.addSlantedModifier({ text, label, direction });
+	} else if (horizontals.includes(tag.name.toLowerCase())) {
+		var direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "right", () => "left");
+		var diagrammedTag = parentDiagram.addPhrase({ text, label, direction });
+	} else throw new Error("Don't know what direction to draw tag named" + tag.name + ". Add it to slantedModifiers or horizontals at the top of parse-xml.js.");
+
+	// recursively parse tag's children
+	tag.elements?.forEach(childTag => { parseTag(childTag, diagrammedTag)});
+
+	return diagrammedTag;
 }
