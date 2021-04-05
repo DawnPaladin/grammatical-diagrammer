@@ -1,0 +1,5 @@
+XML spec
+
+Definitions according to RFC 2119 (https://tools.ietf.org/html/rfc2119)
+
+The XML file MUST have <GrammaticalDiagram> as its top-level tag. <GrammaticalDiagram> SHOULD have one or more <Clause> tags as its immediate children.

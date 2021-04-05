@@ -3,8 +3,7 @@ import { Point, Clause, saveAs } from './draw.js';
 import parseXML from './parse-xml.js';
 import fs from 'fs';
 
-const clauses = parseXML('./grammatical-diagram.xml');
-const diagrams = clauses.map(clauseObj => new Clause(clauseObj));
+const clauseDiagrams = parseXML('./grammatical-diagram.xml');
 
 // var ltrSentence = new Clause({
 // 	subject: "",

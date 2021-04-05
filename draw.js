@@ -301,4 +301,4 @@ class Clause {
 
 const saveAs = draw; // so we can do saveAs.svg()
 
-export { Point, Word, Clause, saveAs };
+export { Point, Word, Clause, saveAs, rightOrLeft };

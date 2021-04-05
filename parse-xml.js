@@ -1,6 +1,7 @@
 import fs from 'fs';
 import convert from 'xml-js';
 import isRTL from './is-rtl.js';
+import { Word, Clause, rightOrLeft } from './draw.js';
 
 export default function(filePath) {
 	const xml = fs.readFileSync(filePath).toString();
@@ -9,7 +10,7 @@ export default function(filePath) {
 	if (!(input.elements && input.elements[0] && input.elements[0].name === "GrammaticalDiagram")) throw new Error("Invalid XML file. Must have <GrammaticalDiagram> as top-level tag.");
 	const grammaticalDiagramTagObj = input.elements[0];
 
-	const clauses = grammaticalDiagramTagObj.elements.map(clauseTagObj => {
+	const clauseDiagrams = grammaticalDiagramTagObj.elements.map(clauseTagObj => {
 		const subjectObj = clauseTagObj.elements.find(element => element.name === "Subject");
 		const subjectText = subjectObj?.attributes?.word || "";
 		const verbObj = clauseTagObj.elements.find(element => element.name === "Verb");
@@ -18,11 +19,24 @@ export default function(filePath) {
 		var clauseDirection = clauseTagObj.elements?.attributes?.direction;
 		if (!clauseDirection) clauseDirection = (isRTL(subjectText) || isRTL(verbText)) ? "left" : "right";
 
-		return {
+		const diagram = new Clause({
 			subject: subjectText,
 			verb: verbText,
 			direction: clauseDirection
-		}
+		});
+
+		subjectObj.elements.forEach(elementObj => { parseTag(elementObj, diagram.subject)});
+		verbObj.elements.forEach(elementObj => { parseTag(elementObj, diagram.verb)});
+		return diagram;
 	});
-	return clauses;
+	return clauseDiagrams;
+}
+
+function parseTag(tag, parent) {
+	var direction = tag.attributes.direction || rightOrLeft(parent, () => "downRight", () => "downLeft");
+	return parent.addSlantedModifier({
+		text: tag.attributes.word,
+		label: tag.attributes.label || tag.name,
+		direction
+	})
 }
