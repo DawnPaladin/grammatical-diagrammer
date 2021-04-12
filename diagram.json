@@ -1,0 +1,91 @@
+{
+  "elements": [
+    {
+      "type": "element",
+      "name": "GrammaticalDiagram",
+      "elements": [
+        {
+          "type": "element",
+          "name": "Clause",
+          "attributes": {
+            "direction": "right"
+          },
+          "elements": [
+            {
+              "type": "element",
+              "name": "Subject",
+              "attributes": {
+                "word": "fox"
+              },
+              "elements": [
+                {
+                  "type": "element",
+                  "name": "Article",
+                  "attributes": {
+                    "word": "the"
+                  }
+                },
+                {
+                  "type": "element",
+                  "name": "Adjective",
+                  "attributes": {
+                    "word": "quick"
+                  }
+                },
+                {
+                  "type": "element",
+                  "name": "Adjective",
+                  "attributes": {
+                    "word": "brown"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "element",
+              "name": "Verb",
+              "attributes": {
+                "word": "jumps"
+              },
+              "elements": [
+                {
+                  "type": "element",
+                  "name": "Preposition",
+                  "attributes": {
+                    "word": "over"
+                  },
+                  "elements": [
+                    {
+                      "type": "element",
+                      "name": "Phrase",
+                      "attributes": {
+                        "word": "dog",
+                        "label": "object of preposition"
+                      },
+                      "elements": [
+                        {
+                          "type": "element",
+                          "name": "Article",
+                          "attributes": {
+                            "word": "the"
+                          }
+                        },
+                        {
+                          "type": "element",
+                          "name": "Adjective",
+                          "attributes": {
+                            "word": "lazy"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
