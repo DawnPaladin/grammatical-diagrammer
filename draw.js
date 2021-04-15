@@ -90,6 +90,7 @@ class Word {
 			x: -20, y: -38,
 			direction: "rtl"
 		};
+		if (!this.text) throw new Error("Text not found. Cannot create word SVG.");
 		var text = draw.text(this.text).attr(attributes).font(textFont);
 		this.length = this.calcLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
@@ -196,7 +197,7 @@ class Word {
 	 * @param {boolean} [options.debug]
 	 * @returns {Word}
 	 */
-		addSlantedModifier(options) {
+	addUnderslant(options) {
 		const attachPoint = this.newAttachment();
 		const newWord = new Word({
 			origin: attachPoint,
@@ -215,7 +216,7 @@ class Word {
 	// For objects of prepositions
 	addPhrase(options) {
 		this.hasAttachedPhrase = true;
-		return this.addSlantedModifier(options);
+		return this.addUnderslant(options);
 	}
 }
 

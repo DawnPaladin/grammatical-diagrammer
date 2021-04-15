@@ -1,17 +1,19 @@
 <GrammaticalDiagram>
-	<Clause direction="right">
-		<Subject word="fox">
-			<Article word="the" />
-			<Adjective word="quick" />
-			<Adjective word="brown" />
+	<Baseline direction="right">
+		<Subject englishText="fox">
+			<Underslant englishText="the" label="article"/>
+			<Underslant englishText="quick" label="adjective"/>
+			<Underslant englishText="brown" label="adjective"/>
 		</Subject>
-		<Verb word="jumps">
-			<Preposition word="over">
-				<Phrase word="dog" label="object of preposition">
-					<Article word="the" />
-					<Adjective word="lazy" />
-				</Phrase>
-			</Preposition>
+		<Verb englishText="jumps" label="verb">
+			<Underslant englishText="over" label="preposition">
+				<Baseline>
+					<Word englishText="dog" label="object of preposition">
+						<Underslant englishText="the" label="article"/>
+						<Underslant englishText="lazy" label="adjective"/>
+					</Word>
+				</Baseline>
+			</Underslant>
 		</Verb>
-	</Clause>
+	</Baseline>
 </GrammaticalDiagram>

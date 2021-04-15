@@ -1,0 +1,73 @@
+<GrammaticalDiagram>
+    <BaselineGroup>
+        <Baseline>
+            <SubjectSlot>
+                <Word hebrewText="אֱלֹ֘הֵ֤י" englishText="God">
+                    <Understraight hebrewText="צִדְקִ֗" englishText="righteous">
+                        <Understraight hebrewText="י" englishText="my" />
+                    </Understraight>
+                </Word>
+            </SubjectSlot>
+            <VerbSlot>
+                <Word hebrewText="עֲנֵ" englishText="answer" />
+                <UnderslantThenStraight>
+                    <Word hebrewText="בְּ" englishText="when" />
+                    <StiltedBaseline>
+                        <SubjectSlot>
+                            <Word hebrewText="י" englishText="I" />
+                        </SubjectSlot>
+                        <VerbSlot>
+                            <Word hebrewText="קָרְאִ" englishText="call" />
+                        </VerbSlot>
+                    </StiltedBaseline>
+                </UnderslantThenStraight>
+            </VerbSlot>
+            
+            <ObjectSlot>
+                <Word hebrewText="נִי" englishText="me" />
+            </ObjectSlot>
+        </Baseline>
+    </BaselineGroup>
+    
+    <BaselineGroup>
+        <Baseline>
+            <SubjectSlot />
+            <VerbSlot>
+                <Word hebrewText="הִרְחַ֣בְתָּ" englishText="you made spacious" />
+                <UnderslantThenStraight>
+                    <Word hebrewText="בַּ צָר" englishText="in trouble" />
+                    <Underslant>
+                        <Word hebrewText="ה" englishText="the" />
+                    </Underslant>
+                </UnderslantThenStraight>
+                <UnderslantThenStraight>
+                    <Word hebrewText="לִּ֑י" englishText="for me" />
+                </UnderslantThenStraight>
+            </VerbSlot>
+        </Baseline>
+    </BaselineGroup>
+    
+    <BaselineGroup hebrewJoiner="וּ" englishJoiner="and">
+        <Baseline>
+            <SubjectSlot />        
+            <VerbSlot>
+                <Word hebrewText="חָ֝נֵּ" englishText="have mercy on" />
+            </VerbSlot>        
+            <ObjectSlot>
+                <Word hebrewText="נִי" englishText="me" />
+            </ObjectSlot>
+        </Baseline>
+        <Baseline>
+            <SubjectSlot />
+            <VerbSlot>
+                <Word hebrewText="ּשְׁמַ֥ע" englishText="hear" />
+            </VerbSlot>
+            <ObjectSlot>
+                <UnderstraightGroup>
+                    <Word hebrewText="תְּפִלָּתִֽ" englishText="prayer" />
+                    <Word hebrewText="י" englishText="my" />
+                </UnderstraightGroup>
+            </ObjectSlot>
+        </Baseline>
+    </BaselineGroup>
+</GrammaticalDiagram>

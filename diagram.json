@@ -6,7 +6,7 @@
       "elements": [
         {
           "type": "element",
-          "name": "Clause",
+          "name": "Baseline",
           "attributes": {
             "direction": "right"
           },
@@ -15,28 +15,31 @@
               "type": "element",
               "name": "Subject",
               "attributes": {
-                "word": "fox"
+                "englishText": "fox"
               },
               "elements": [
                 {
                   "type": "element",
-                  "name": "Article",
+                  "name": "Underslant",
                   "attributes": {
-                    "word": "the"
+                    "englishText": "the",
+                    "label": "article"
                   }
                 },
                 {
                   "type": "element",
-                  "name": "Adjective",
+                  "name": "Underslant",
                   "attributes": {
-                    "word": "quick"
+                    "englishText": "quick",
+                    "label": "adjective"
                   }
                 },
                 {
                   "type": "element",
-                  "name": "Adjective",
+                  "name": "Underslant",
                   "attributes": {
-                    "word": "brown"
+                    "englishText": "brown",
+                    "label": "adjective"
                   }
                 }
               ]
@@ -45,37 +48,47 @@
               "type": "element",
               "name": "Verb",
               "attributes": {
-                "word": "jumps"
+                "englishText": "jumps",
+                "label": "verb"
               },
               "elements": [
                 {
                   "type": "element",
-                  "name": "Preposition",
+                  "name": "Underslant",
                   "attributes": {
-                    "word": "over"
+                    "englishText": "over",
+                    "label": "preposition"
                   },
                   "elements": [
                     {
                       "type": "element",
-                      "name": "Phrase",
-                      "attributes": {
-                        "word": "dog",
-                        "label": "object of preposition"
-                      },
+                      "name": "Baseline",
                       "elements": [
                         {
                           "type": "element",
-                          "name": "Article",
+                          "name": "Word",
                           "attributes": {
-                            "word": "the"
-                          }
-                        },
-                        {
-                          "type": "element",
-                          "name": "Adjective",
-                          "attributes": {
-                            "word": "lazy"
-                          }
+                            "englishText": "dog",
+                            "label": "object of preposition"
+                          },
+                          "elements": [
+                            {
+                              "type": "element",
+                              "name": "Underslant",
+                              "attributes": {
+                                "englishText": "the",
+                                "label": "article"
+                              }
+                            },
+                            {
+                              "type": "element",
+                              "name": "Underslant",
+                              "attributes": {
+                                "englishText": "lazy",
+                                "label": "adjective"
+                              }
+                            }
+                          ]
                         }
                       ]
                     }
