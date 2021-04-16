@@ -20,7 +20,9 @@ export default function(filePath) {
 }
 
 function parseTag(tag, parentDiagram) {
-	if (tag.name == "Baseline") {
+	if (tag.name == "BaselineGroup") {
+		return parseBaselineGroup(tag);
+	} else if (tag.name == "Baseline") {
 		return parseBaseline(tag, parentDiagram);
 	}
 	if (!tag || !tag.attributes || !tag.attributes[textAttr]) debugger;
@@ -31,9 +33,6 @@ function parseTag(tag, parentDiagram) {
 	if (tag.name == "Underslant") {
 		var direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "downRight", () => "downLeft");
 		var diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
-	} else if (tag.name == "Baseline") {
-		var direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "right", () => "left");
-		var diagrammedTag = parentDiagram.addPhrase({ text, label, direction });
 	} else throw new Error("Don't recognize tag named" + tag.name + ".");
 
 	// recursively parse tag's children
@@ -43,7 +42,9 @@ function parseTag(tag, parentDiagram) {
 }
 
 function parseBaselineGroup(baselineGroup) {
-
+	if (baselineGroup.elements.length == 1) {
+		parseBaseline(baselineGroup.elements[0], null);
+	}
 }
 function parseBaseline(baselineTag, parentDiagram) {
 	const subjectTag = baselineTag.elements.find(element => element.name === "Subject");
