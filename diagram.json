@@ -2,97 +2,32 @@
   "elements": [
     {
       "type": "element",
-      "name": "GrammaticalDiagram",
+      "name": "grammaticalDiagram",
       "elements": [
         {
           "type": "element",
-          "name": "Baseline",
+          "name": "word",
           "attributes": {
+            "gloss": "happiness",
+            "word": "אשרי",
             "direction": "right"
           },
           "elements": [
             {
               "type": "element",
-              "name": "Subject",
+              "name": "stairstep",
               "attributes": {
-                "englishText": "fox"
+                "gloss": "man",
+                "word": "איש"
               },
               "elements": [
                 {
                   "type": "element",
-                  "name": "Underslant",
+                  "name": "underslant",
                   "attributes": {
-                    "englishText": "the",
-                    "label": "article"
+                    "gloss": "The",
+                    "word": "הָ"
                   }
-                },
-                {
-                  "type": "element",
-                  "name": "Underslant",
-                  "attributes": {
-                    "englishText": "quick",
-                    "label": "adjective"
-                  }
-                },
-                {
-                  "type": "element",
-                  "name": "Underslant",
-                  "attributes": {
-                    "englishText": "brown",
-                    "label": "adjective"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "element",
-              "name": "Verb",
-              "attributes": {
-                "englishText": "jumps",
-                "label": "verb"
-              },
-              "elements": [
-                {
-                  "type": "element",
-                  "name": "Underslant",
-                  "attributes": {
-                    "englishText": "over",
-                    "label": "preposition"
-                  },
-                  "elements": [
-                    {
-                      "type": "element",
-                      "name": "Baseline",
-                      "elements": [
-                        {
-                          "type": "element",
-                          "name": "Word",
-                          "attributes": {
-                            "englishText": "dog",
-                            "label": "object of preposition"
-                          },
-                          "elements": [
-                            {
-                              "type": "element",
-                              "name": "Underslant",
-                              "attributes": {
-                                "englishText": "the",
-                                "label": "article"
-                              }
-                            },
-                            {
-                              "type": "element",
-                              "name": "Underslant",
-                              "attributes": {
-                                "englishText": "lazy",
-                                "label": "adjective"
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
                 }
               ]
             }

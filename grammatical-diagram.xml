@@ -1,19 +1,7 @@
-<GrammaticalDiagram>
-	<Baseline direction="right">
-		<Subject englishText="fox">
-			<Underslant englishText="the" label="article"/>
-			<Underslant englishText="quick" label="adjective"/>
-			<Underslant englishText="brown" label="adjective"/>
-		</Subject>
-		<Verb englishText="jumps" label="verb">
-			<Underslant englishText="over" label="preposition">
-				<Baseline>
-					<Word englishText="dog" label="object of preposition">
-						<Underslant englishText="the" label="article"/>
-						<Underslant englishText="lazy" label="adjective"/>
-					</Word>
-				</Baseline>
-			</Underslant>
-		</Verb>
-	</Baseline>
-</GrammaticalDiagram>
+<grammaticalDiagram>
+    <word gloss="happiness" word="אשרי" direction="right">
+        <stairstep gloss="man" word="איש">
+            <underslant gloss="The"  word="הָ" />
+        </stairstep>
+    </word>
+</grammaticalDiagram>

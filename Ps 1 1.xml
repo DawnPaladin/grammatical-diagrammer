@@ -1,0 +1,47 @@
+<grammaticalDiagram>
+    <word gloss="happiness" word="אשרי">
+        <stairstep gloss="man" word="איש">
+            <underslant gloss="The"  word="הָ" />
+        </stairstep>
+    </word>
+    <dashedLine id="1" location="start" gloss="who/which" word="אשר" />
+    <dashedLine id="2" location="start" />
+    <baseline>
+        <subject gloss="" word="">
+            <dashedLine id="1" location="end" /> 
+        </subject>
+        <verticalCutThroughLine/>
+        <baselineGroup>
+            <baseline>
+                <verb gloss="Go" word="הלך">
+                    <underslant gloss="Not" word="לא" />
+					<underslantThenStraight gloss="In the counsel" word="בעצת">
+						<stairstep gloss="( )" word="">
+							<underslant gloss="Wicked" word="רשעים" />
+						</stairstep>
+                    </underslantThenStraight>
+                </verb>
+            </baseline>
+            <dashedLine gloss="And" word="ו" />
+            <baseline>
+                <verb gloss="stand" word="עמד">
+                    <underslant gloss="Not" word="לא" />
+                    <underslantThenStraight gloss="In the way" word="בדרך">
+                        <stairstep gloss="( )" word="">
+                            <underslant gloss="Sinners" word="חטאים" />
+                        </stairstep>
+                    </underslantThenStraight>
+                </verb>
+            </baseline>
+            <dashedLine gloss="And" word="ו" />
+            <baseline>
+                <verb gloss="sit" word="ישב">
+                    <underslant gloss="Not" word="לא" />
+                    <underslantThenStraight word="In the seat" word="במושב">
+                        <understraight gloss="Mockers" word="לצים" />
+                    </underslant>
+                </verb>
+            </baseline>
+        </baselineGroup>
+    </baseline>
+</grammaticalDiagram>

@@ -26,8 +26,10 @@ class Point {
  * @returns {any}
  */
 function rightOrLeft(object, ifRight, ifLeft) {
-	if (object.direction == "right" || object.direction == "downRight") return ifRight();
-	else if (object.direction == "left" || object.direction == "downLeft") return ifLeft();
+	if (object.direction == "right" || object.direction == "downRight")
+		return typeof ifRight === "function" ? ifRight() : ifRight;
+	else if (object.direction == "left" || object.direction == "downLeft") 
+		return typeof ifLeft === "function" ? ifLeft() : ifLeft;
 	else throw new Error("Invalid direction");
 }
 
