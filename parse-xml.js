@@ -19,36 +19,58 @@ export default function(filePath) {
 	return baselines;
 }
 
-function tagNameMatches(tag, name) {
-	return lowercaseFirstLetter(tag.name) === lowercaseFirstLetter(name);
+/**
+ * Checks whether a tag's name can be found in a list of names
+ * @param {object} tag XML tag with a "name" property
+ * @param  {...string} names One or more strings to check the name against
+ * @returns {boolean}
+ */
+function tagNameMatches(tag, ...names) {
+	return names.some(name => {
+		return lowercaseFirstLetter(tag.name) === lowercaseFirstLetter(name);
+	});
 }
 function lowercaseFirstLetter(string) {
 	return string[0].toLowerCase() + string.substr(1);
 }
 
 function parseTag(tag, parentDiagram) {
-	if (!tag || !tag.attributes) throw new Error("Invalid tag");
 	if (tagNameMatches(tag, "BaselineGroup")) {
 		return parseBaselineGroup(tag);
 	} else if (tagNameMatches(tag, "Baseline")) {
 		return parseBaseline(tag, parentDiagram);
 	}
-	if (!tag.attributes[textAttr]) throw new Error(`Text not found for tag ${tag.name}`);
-	var text = tag.attributes[textAttr];
-	var label = tag.attributes.label || tag.name.toLowerCase();
 
-	var diagrammedTag, direction;
-	if (tagNameMatches(tag, "Word")) {
-		direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "right", () => "left");
+	if (tag.attributes) {
+		// tag may have text on it
+		var text = tag.attributes[textAttr];
+		var label = tag.attributes.label || tag.name.toLowerCase();
 		var defaultOrigin = new Point(10, 40);
-		diagrammedTag = new Word({ origin: defaultOrigin, text, label, direction });
-	} else if (tagNameMatches(tag, "Underslant")) {
-		direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "downRight", () => "downLeft");
-		diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
-	} else if (tagNameMatches(tag, "Stairstep")) {
-		direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "right", () => "left");
-		diagrammedTag = parentDiagram.addStairstep({ origin: defaultOrigin, text, label, direction });
-	} else throw new Error("Don't recognize tag named " + tag.name + ".");
+		var diagrammedTag, direction;
+		if (tagNameMatches(tag, "Word", "Subject", "Verb")) {
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
+			diagrammedTag = new Word({ origin: defaultOrigin, text, label, direction });
+		} else if (tagNameMatches(tag, "Underslant")) {
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "downRight", "downLeft");
+			diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
+		} else if (tagNameMatches(tag, "UnderslantThenStraight")) {
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
+			diagrammedTag = parentDiagram.addUnderslantThenStraight({ origin: defaultOrigin, text, label, direction });
+		} else if (tagNameMatches(tag, "Stairstep")) {
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
+			diagrammedTag = parentDiagram.addStairstep({ origin: defaultOrigin, text, label, direction });
+		} else throw new Error("Don't recognize tag named " + tag.name + ".");
+	} else {
+		// tag has no text
+		if (tagNameMatches(tag, "Baseline")) {
+			diagrammedTag = new Word({
+				origin: defaultOrigin,
+				text: "",
+				label: "",
+				direction: preferEnglish ? "right" : "left"
+			});
+		} else throw new Error("Unrecognized empty tag named " + tag.name);
+	}
 
 	// recursively parse tag's children
 	tag.elements?.forEach(childTag => { parseTag(childTag, diagrammedTag)});

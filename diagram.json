@@ -6,28 +6,52 @@
       "elements": [
         {
           "type": "element",
-          "name": "word",
-          "attributes": {
-            "gloss": "happiness",
-            "word": "אשרי",
-            "direction": "right"
-          },
+          "name": "baseline",
           "elements": [
             {
               "type": "element",
-              "name": "stairstep",
+              "name": "verb",
               "attributes": {
-                "gloss": "man",
-                "word": "איש"
+                "gloss": "Go",
+                "word": "הלך",
+                "direction": "right"
               },
               "elements": [
                 {
                   "type": "element",
                   "name": "underslant",
                   "attributes": {
-                    "gloss": "The",
-                    "word": "הָ"
+                    "gloss": "Not",
+                    "word": "לא"
                   }
+                },
+                {
+                  "type": "element",
+                  "name": "underslantThenStraight",
+                  "attributes": {
+                    "gloss": "In the counsel",
+                    "word": "בעצת"
+                  },
+                  "elements": [
+                    {
+                      "type": "element",
+                      "name": "stairstep",
+                      "attributes": {
+                        "gloss": "( )",
+                        "word": ""
+                      },
+                      "elements": [
+                        {
+                          "type": "element",
+                          "name": "underslant",
+                          "attributes": {
+                            "gloss": "Wicked",
+                            "word": "רשעים"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }

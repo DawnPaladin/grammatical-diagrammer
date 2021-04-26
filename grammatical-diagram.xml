@@ -1,7 +1,12 @@
 <grammaticalDiagram>
-    <word gloss="happiness" word="אשרי" direction="right">
-        <stairstep gloss="man" word="איש">
-            <underslant gloss="The"  word="הָ" />
-        </stairstep>
-    </word>
+    <baseline>
+        <verb gloss="Go" word="הלך" direction="right">
+            <underslant gloss="Not" word="לא" />
+            <underslantThenStraight gloss="In the counsel" word="בעצת">
+                <stairstep gloss="( )" word="">
+                    <underslant gloss="Wicked" word="רשעים" />
+                </stairstep>
+            </underslantThenStraight>
+        </verb>
+    </baseline>
 </grammaticalDiagram>

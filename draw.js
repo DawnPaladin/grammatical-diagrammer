@@ -216,6 +216,27 @@ class Word {
 		return newWord;
 	}
 
+	addUnderslantThenStraight(options) {
+		const attachPoint = this.newAttachPoint();
+		const downLineEndpoint = new Point(
+			rightOrLeft(options, attachPoint.x + 17, attachPoint.x - 20),
+			attachPoint.y + 30
+		)
+		const downLine = draw.line(...attachPoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
+		const newWord = new Word({
+			origin: downLineEndpoint,
+			text: options.text,
+			label: options.label,
+			direction: options.direction,
+			parent: this,
+		});
+		this.children.push(downLine);
+		this.descenders.push(newWord);
+		this.children.push(newWord);
+		this.recursiveRender(this);
+		return newWord;
+	}
+
 	addStairstep(options) {
 		const downLineEndpoint = new Point(this.lineEndpoint.x, this.lineEndpoint.y + 30)
 		const downLine = draw.line(...this.lineEndpoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
