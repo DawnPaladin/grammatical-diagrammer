@@ -45,6 +45,9 @@ function parseTag(tag, parentDiagram) {
 	} else if (tagNameMatches(tag, "Underslant")) {
 		direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "downRight", () => "downLeft");
 		diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
+	} else if (tagNameMatches(tag, "Stairstep")) {
+		direction = tag.attributes.direction || rightOrLeft(parentDiagram, () => "right", () => "left");
+		diagrammedTag = parentDiagram.addStairstep({ origin: defaultOrigin, text, label, direction });
 	} else throw new Error("Don't recognize tag named " + tag.name + ".");
 
 	// recursively parse tag's children

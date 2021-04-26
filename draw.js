@@ -1,6 +1,6 @@
 const darkMode = false;
 const foregroundColor = darkMode ? "white" : "black";
-const lineStyle = { width: 3, color: foregroundColor };
+const lineStyle = { width: 3, color: foregroundColor, linecap: 'round' };
 const textFont = { size: 24, fill: foregroundColor };
 const descenderOffset = 45; // distance between descender attachment points
 
@@ -41,7 +41,7 @@ function rightOrLeft(object, ifRight, ifLeft) {
  * @returns {boolean}
  */
 function isRightPointing(object) {
-	return rightOrLeft(object, () => true, () => false);
+	return rightOrLeft(object, true, false);
 }
 /**
  * Opposite of isRightPointing.
@@ -71,8 +71,9 @@ class Word {
 		this.debug = options.debug;
 
 		this.group = draw.group();
-		this.attachments = [];
-		this.descenders = [];
+		this.attachPoints = []; // regularly-spaced points on the baseline for descenders to attach to
+		this.descenders = []; // underslants descending from this baseline
+		this.children = []; // all baselines that depend on this Word for their position, including descenders and stairsteps
 
 		this.render();
 	}
@@ -145,19 +146,19 @@ class Word {
 		}
 		this.group.transform(transformation);
 	}
-	newAttachment() {
+	newAttachPoint() {
 		// don't conditionalize this - the downRight/downLeft conditional expects it
-		var attachPointX = 20 + this.attachments.length * descenderOffset;
+		var attachPointX = 20 + this.attachPoints.length * descenderOffset;
 
 		if (this.direction == "left") {
-			attachPointX = -20 - this.attachments.length * descenderOffset;
+			attachPointX = -20 - this.attachPoints.length * descenderOffset;
 		}
 		if (this.direction == "downRight" || this.direction == "downLeft") {
 			attachPointX = this.length - attachPointX; // attach to the right end instead of the left
 		}
 
 		var attachPoint = new Point(attachPointX, 0);
-		this.attachments.push(attachPoint);
+		this.attachPoints.push(attachPoint);
 		return attachPoint;
 	}
 	render() {
@@ -172,8 +173,8 @@ class Word {
 
 		this.transformGroup();
 
-		this.descenders.forEach(descender => {
-			this.group.add(descender.group)
+		this.children.forEach(child => {
+			child.group ? this.group.add(child.group) : this.group.add(child);
 		})
 
 		if (this.debug == true) {
@@ -200,7 +201,7 @@ class Word {
 	 * @returns {Word}
 	 */
 	addUnderslant(options) {
-		const attachPoint = this.newAttachment();
+		const attachPoint = this.newAttachPoint();
 		const newWord = new Word({
 			origin: attachPoint,
 			text: options.text,
@@ -210,8 +211,24 @@ class Word {
 			parent: this,
 		});
 		this.descenders.push(newWord);
+		this.children.push(newWord);
 		this.recursiveRender(this);
-		
+		return newWord;
+	}
+
+	addStairstep(options) {
+		const downLineEndpoint = new Point(this.lineEndpoint.x, this.lineEndpoint.y + 30)
+		const downLine = draw.line(...this.lineEndpoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
+		const newWord = new Word({
+			origin: downLineEndpoint,
+			text: options.text,
+			label: options.label,
+			direction: options.direction,
+			parent: this,
+		});
+		this.children.push(newWord);
+		this.children.push(downLine);
+		this.recursiveRender(newWord);
 		return newWord;
 	}
 
