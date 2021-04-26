@@ -1,11 +1,9 @@
 <grammaticalDiagram>
     <baseline>
-        <verb gloss="Go" word="הלך" direction="right">
+        <verb gloss="sit" word="ישב">
             <underslant gloss="Not" word="לא" />
-            <underslantThenStraight gloss="In the counsel" word="בעצת">
-                <stairstep gloss="( )" word="">
-                    <underslant gloss="Wicked" word="רשעים" />
-                </stairstep>
+            <underslantThenStraight gloss="In the seat" word="במושב">
+                <understraight gloss="Mockers" word="לצים" />
             </underslantThenStraight>
         </verb>
     </baseline>

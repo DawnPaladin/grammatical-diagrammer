@@ -47,6 +47,9 @@ function parseTag(tag, parentDiagram) {
 		} else if (tagNameMatches(tag, "Underslant")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "downRight", "downLeft");
 			diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
+		} else if (tagNameMatches(tag, "Understraight")) {
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
+			diagrammedTag = parentDiagram.addUnderstraight({ text, label, direction });
 		} else if (tagNameMatches(tag, "UnderslantThenStraight")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
 			diagrammedTag = parentDiagram.addUnderslantThenStraight({ origin: defaultOrigin, text, label, direction });

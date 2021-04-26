@@ -113,6 +113,9 @@ class Word {
 			var lastDescender = this.descenders[this.descenders.length - 1];
 			if (lastDescender.direction == "downLeft" || lastDescender.direction == "downRight") {
 				descendersWidth += lastDescender.length * .7;
+			} else if (lastDescender.direction == "right" || lastDescender.direction == "left") {
+				// handle understraights and underslantThenStraights
+				descendersWidth += 40;
 			}
 		}
 		// if this is a diagonal line with a horizontal phrase attached to it, it will need more space
@@ -216,6 +219,24 @@ class Word {
 		return newWord;
 	}
 
+	addUnderstraight(options) {
+		const attachPoint = this.newAttachPoint();
+		const downLineEndpoint = new Point(attachPoint.x, attachPoint.y + 30)
+		const downLine = draw.line(...attachPoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
+		const newWord = new Word({
+			origin: downLineEndpoint,
+			text: options.text,
+			label: options.label,
+			direction: options.direction,
+			parent: this,
+		});
+		this.children.push(downLine);
+		this.children.push(newWord);
+		this.descenders.push(newWord);
+		this.recursiveRender(newWord);
+		return newWord;
+	}
+
 	addUnderslantThenStraight(options) {
 		const attachPoint = this.newAttachPoint();
 		const downLineEndpoint = new Point(
@@ -231,8 +252,8 @@ class Word {
 			parent: this,
 		});
 		this.children.push(downLine);
-		this.descenders.push(newWord);
 		this.children.push(newWord);
+		this.descenders.push(newWord);
 		this.recursiveRender(this);
 		return newWord;
 	}

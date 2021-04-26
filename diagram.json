@@ -12,9 +12,8 @@
               "type": "element",
               "name": "verb",
               "attributes": {
-                "gloss": "Go",
-                "word": "הלך",
-                "direction": "right"
+                "gloss": "sit",
+                "word": "ישב"
               },
               "elements": [
                 {
@@ -29,27 +28,17 @@
                   "type": "element",
                   "name": "underslantThenStraight",
                   "attributes": {
-                    "gloss": "In the counsel",
-                    "word": "בעצת"
+                    "gloss": "In the seat",
+                    "word": "במושב"
                   },
                   "elements": [
                     {
                       "type": "element",
-                      "name": "stairstep",
+                      "name": "understraight",
                       "attributes": {
-                        "gloss": "( )",
-                        "word": ""
-                      },
-                      "elements": [
-                        {
-                          "type": "element",
-                          "name": "underslant",
-                          "attributes": {
-                            "gloss": "Wicked",
-                            "word": "רשעים"
-                          }
-                        }
-                      ]
+                        "gloss": "Mockers",
+                        "word": "לצים"
+                      }
                     }
                   ]
                 }

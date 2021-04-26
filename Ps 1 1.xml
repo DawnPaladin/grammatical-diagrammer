@@ -37,9 +37,9 @@
             <baseline>
                 <verb gloss="sit" word="ישב">
                     <underslant gloss="Not" word="לא" />
-                    <underslantThenStraight word="In the seat" word="במושב">
+                    <underslantThenStraight gloss="In the seat" word="במושב">
                         <understraight gloss="Mockers" word="לצים" />
-                    </underslant>
+                    </underslantThenStraight>
                 </verb>
             </baseline>
         </baselineGroup>

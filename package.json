@@ -7,7 +7,7 @@
   },
   "scripts": {
     "generate": "node .",
-    "dev": "light-server -s . -p 8080 -w '*.js, *.html # npm run generate'"
+    "dev": "light-server -s . -p 8080 -w '*.js, *.html, *.xml # npm run generate'"
   },
   "type": "module"
 }
