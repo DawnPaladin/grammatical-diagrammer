@@ -35,17 +35,11 @@ function lowercaseFirstLetter(string) {
 }
 
 function parseTag(tag, parentDiagram) {
-	if (tagNameMatches(tag, "BaselineGroup")) {
-		return parseBaselineGroup(tag);
-	} else if (tagNameMatches(tag, "Baseline")) {
-		return parseBaseline(tag, parentDiagram);
-	}
-
+	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(100, 40);
 	if (tag.attributes) {
 		// tag may have text on it
 		var text = tag.attributes[textAttr];
 		var label = tag.attributes.label || tag.name.toLowerCase();
-		var defaultOrigin = new Point(10, 40);
 		var diagrammedTag, direction;
 		if (tagNameMatches(tag, "Word", "Subject", "Verb")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
@@ -84,45 +78,4 @@ function getTagText(tag) {
 	} else {
 		return "";
 	}
-}
-
-function parseBaselineGroup(baselineGroup) {
-	if (baselineGroup.elements.length == 1) {
-		return parseBaseline(baselineGroup.elements[0], null);
-	}
-}
-function parseBaseline(baselineTag, parentDiagram) {
-	const subjectSlotTag = baselineTag.elements.find(element => element.name === "SubjectSlot");
-	const subjectText = getTagText(subjectSlotTag);
-	const verbSlotTag = baselineTag.elements.find(element => element.name === "VerbSlot");
-	const verbText = getTagText(verbSlotTag);
-	const wordTag = baselineTag.elements.find(element => element.name === "Word");
-	const wordText = wordTag?.attributes[textAttr] || "";
-	const wordLabel = wordTag?.attributes?.label || "";
-
-	var direction = baselineTag.elements?.attributes?.direction;
-	if (!direction) direction = (isRTL(subjectText) || isRTL(verbText)) ? "left" : "right";
-
-	let diagram;
-	if (subjectSlotTag && verbSlotTag) {
-		diagram = new Clause({
-			subject: subjectText,
-			verb: verbText,
-			direction: direction
-		});
-
-		subjectSlotTag.elements.forEach(elementTag => { parseTag(elementTag, diagram.subject) });
-		verbSlotTag.elements.forEach(elementTag => { parseTag(elementTag, diagram.verb) });
-	} else if (wordTag) {
-		diagram = parentDiagram.addPhrase({
-			origin: parentDiagram.origin,
-			text: wordText,
-			label: wordLabel,
-			direction,
-			parent: parentDiagram
-		});
-
-		wordTag.elements.forEach(elementTag => { parseTag(elementTag, diagram)});
-	}
-	return diagram;
 }

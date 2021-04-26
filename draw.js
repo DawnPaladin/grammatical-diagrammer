@@ -93,7 +93,7 @@ class Word {
 			x: -20, y: -38,
 			direction: "rtl"
 		};
-		if (!this.text) throw new Error("Text not found. Cannot create word SVG.");
+		if (!this.text) this.text = " ";
 		var text = draw.text(this.text).attr(attributes).font(textFont);
 		this.length = this.calcLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
