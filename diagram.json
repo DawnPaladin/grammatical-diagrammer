@@ -7,6 +7,9 @@
         {
           "type": "element",
           "name": "baseline",
+          "attributes": {
+            "direction": "right"
+          },
           "elements": [
             {
               "type": "element",

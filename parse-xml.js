@@ -36,8 +36,8 @@ function lowercaseFirstLetter(string) {
 
 function parseTag(tag, parentDiagram) {
 	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(100, 40);
-	if (tag.attributes) {
-		// tag may have text on it
+	if (tag.attributes && tag.attributes[textAttr]) {
+		// tag has text on it
 		var text = tag.attributes[textAttr];
 		var label = tag.attributes.label || tag.name.toLowerCase();
 		var diagrammedTag, direction;
