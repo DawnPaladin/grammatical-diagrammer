@@ -1,9 +1,9 @@
 import fs from 'fs';
 import convert from 'xml-js';
 import isRTL from './is-rtl.js';
-import { Point, Word, Clause, rightOrLeft } from './draw.js';
+import { Point, Word, Clause, rightOrLeft, saveAs } from './draw.js';
 
-const preferEnglish = true;
+const preferEnglish = false;
 const textAttr = preferEnglish ? "gloss" : "word";
 
 export default function(filePath) {
@@ -35,7 +35,7 @@ function lowercaseFirstLetter(string) {
 }
 
 function parseTag(tag, parentDiagram) {
-	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(100, 40);
+	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(400, 40);
 	if (tag.attributes && tag.attributes[textAttr]) {
 		// tag has text on it
 		var text = tag.attributes[textAttr];

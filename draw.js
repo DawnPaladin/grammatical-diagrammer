@@ -138,7 +138,7 @@ class Word {
 			transformation = {...transformation, rotate: 60, origin: "bottom left" };
 		}
 		if (this.direction == "downLeft" ) {
-			transformation = {...transformation, rotate: -60, origin: "bottom right" };
+			transformation = {translateX: 10, translateY: this.line.width() - 8, rotate: -60, origin: "bottom left" }; // origin: "bottom right" is positioned much too far to the right
 		}
 		// if the line's parent is diagonal but it should be horizontal, rotate it back
 		if (this.direction == "right" && this.parent && this.parent.direction == "downRight") {
@@ -213,9 +213,9 @@ class Word {
 			debug: options.debug,
 			parent: this,
 		});
-		this.descenders.push(newWord);
 		this.children.push(newWord);
-		this.recursiveRender(this);
+		this.descenders.push(newWord);
+		this.recursiveRender(newWord);
 		return newWord;
 	}
 
@@ -228,6 +228,7 @@ class Word {
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
+			debug: options.debug,
 			parent: this,
 		});
 		this.children.push(downLine);
@@ -249,6 +250,7 @@ class Word {
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
+			debug: options.debug,
 			parent: this,
 		});
 		this.children.push(downLine);
@@ -266,6 +268,7 @@ class Word {
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
+			debug: options.debug,
 			parent: this,
 		});
 		this.children.push(newWord);

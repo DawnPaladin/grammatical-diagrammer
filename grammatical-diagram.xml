@@ -1,10 +1,10 @@
 <grammaticalDiagram>
-    <baseline direction="right">
-                <verb gloss="sit" word="ישב">
-                    <underslant gloss="Not" word="לא" />
-                    <underslantThenStraight gloss="In the seat" word="במושב">
-                        <understraight gloss="Mockers" word="לצים" />
-                    </underslantThenStraight>
-                </verb>
+    <baseline direction="left">
+        <verb gloss="sit" word="ישב">
+            <underslant gloss="Not" word="לא" />
+            <underslantThenStraight gloss="In the seat" word="במושב">
+                <understraight gloss="Mockers" word="לצים" />
+            </underslantThenStraight>
+        </verb>
     </baseline>
 </grammaticalDiagram>

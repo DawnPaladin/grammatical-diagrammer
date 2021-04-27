@@ -8,7 +8,7 @@
           "type": "element",
           "name": "baseline",
           "attributes": {
-            "direction": "right"
+            "direction": "left"
           },
           "elements": [
             {
