@@ -48,8 +48,20 @@ function isRightPointing(object) {
  * @param {object} object 
  * @returns {boolean}
  */
-	function isLeftPointing(object) {
+function isLeftPointing(object) {
 	return !isRightPointing(object);
+}
+
+function heightOfRotatedRectangle(rectWidth, rectHeight, degreesRotation) {
+	const radiansRotation = degreesToRadians(degreesRotation);
+	return Math.abs(rectWidth * Math.sin(radiansRotation)) + Math.abs(rectHeight * Math.cos(radiansRotation));
+}
+function widthOfRotatedRectangle(rectWidth, rectHeight, degreesRotation) {
+	const radiansRotation = degreesToRadians(degreesRotation);
+	return Math.abs(rectWidth * Math.cos(radiansRotation)) + Math.abs(rectHeight * Math.sin(radiansRotation));
+}
+function degreesToRadians(degrees) {
+	return degrees * Math.PI / 180;
 }
 
 class Word {
@@ -138,7 +150,12 @@ class Word {
 			transformation = {...transformation, rotate: 60, origin: "bottom left" };
 		}
 		if (this.direction == "downLeft" ) {
-			transformation = {translateX: 10, translateY: this.line.width() - 8, rotate: -60, origin: "bottom left" }; // origin: "bottom right" is positioned much too far to the right
+			transformation = {
+				translateX: -this.origin.x,
+				translateY: this.origin.y + heightOfRotatedRectangle(this.length, 0, -60),
+				rotate: -60, 
+				origin: "bottom left", // origin "bottom right" is positioned much too far to the right
+			};
 		}
 		// if the line's parent is diagonal but it should be horizontal, rotate it back
 		if (this.direction == "right" && this.parent && this.parent.direction == "downRight") {
