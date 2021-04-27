@@ -2,6 +2,8 @@
     <baseline direction="left">
         <verb gloss="Go" word="הלך">
             <underslant gloss="Not" word="לא" />
+            <underslant gloss="Not" word="לאלא" />
+            <underslant gloss="Not" word="לאלאלא" />
             <underslantThenStraight gloss="In the counsel" word="בעצת">
                 <stairstep gloss="( )" word="stairstep">
                     <underslant gloss="Wicked" word="רשעים" />

@@ -151,7 +151,7 @@ class Word {
 		}
 		if (this.direction == "downLeft" ) {
 			transformation = {
-				translateX: -this.origin.x,
+				translateX: this.origin.x + widthOfRotatedRectangle(this.length, 0, -60),
 				translateY: this.origin.y + heightOfRotatedRectangle(this.length, 0, -60),
 				rotate: -60, 
 				origin: "bottom left", // origin "bottom right" is positioned much too far to the right

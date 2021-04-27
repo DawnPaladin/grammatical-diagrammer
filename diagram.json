@@ -29,6 +29,22 @@
                 },
                 {
                   "type": "element",
+                  "name": "underslant",
+                  "attributes": {
+                    "gloss": "Not",
+                    "word": "לאלא"
+                  }
+                },
+                {
+                  "type": "element",
+                  "name": "underslant",
+                  "attributes": {
+                    "gloss": "Not",
+                    "word": "לאלאלא"
+                  }
+                },
+                {
+                  "type": "element",
                   "name": "underslantThenStraight",
                   "attributes": {
                     "gloss": "In the counsel",
