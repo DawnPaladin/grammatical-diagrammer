@@ -9,8 +9,8 @@ const textAttr = preferEnglish ? "gloss" : "word";
 export default function(filePath) {
 	const xml = fs.readFileSync(filePath).toString();
 	const input = convert.xml2js(xml);
-	const json = convert.xml2json(xml, { compact: false, spaces: 2});
-	fs.writeFileSync('diagram.json', json); // write JSON file to disk for ease of debugging
+	// const json = convert.xml2json(xml, { compact: false, spaces: 2});
+	// fs.writeFileSync('diagram.json', json); // write JSON file to disk for ease of debugging
 
 	if (!(input.elements && input.elements[0] && tagNameMatches(input.elements[0], "GrammaticalDiagram"))) throw new Error("Invalid XML file. Must have <GrammaticalDiagram> as top-level tag.");
 	const grammaticalDiagramTagObj = input.elements[0];
