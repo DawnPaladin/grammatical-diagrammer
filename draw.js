@@ -91,12 +91,12 @@ class Word {
 
 		this.render();
 	}
-	createLine() {
-		this.lineEndpoint = this.calcLineEndpoint();
+	createBaseline() {
+		this.baselineEndpoint = this.calcBaselineEndpoint();
 
 		return draw.line(
 			0, 0,
-			...this.lineEndpoint.xy,
+			...this.baselineEndpoint.xy,
 		).stroke(lineStyle);
 	}
 	createWordSvg() {
@@ -110,11 +110,11 @@ class Word {
 		if (!this.text) this.text = " ";
 		var text = draw.text(this.text).attr(attributes).font(textFont);
 		// FIXME
-		this.length = this.calcLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
+		this.baselineLength = this.calcBaselineLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
 		return text.add(label);
 	}
-	calcLength(wordSvg) {
+	calcBaselineLength(wordSvg) {
 		var wordWidth = wordSvg.length() + 40;
 		var descendersWidth = 0;
 		// add space for each descender
@@ -140,8 +140,8 @@ class Word {
 		}
 		return Math.max(wordWidth, descendersWidth);
 	}
-	calcLineEndpoint() {
-		var x = isRightPointing(this) ? 0 + this.length : 0 - this.length;
+	calcBaselineEndpoint() {
+		var x = isRightPointing(this) ? 0 + this.baselineLength : 0 - this.baselineLength;
 		var y = 0;
 		return new Point(x, y);
 	}
@@ -154,8 +154,8 @@ class Word {
 		}
 		if (this.direction == "downLeft" ) {
 			transformation = {
-				translateX: this.origin.x + widthOfRotatedRectangle(this.length, 0, -60),
-				translateY: this.origin.y + heightOfRotatedRectangle(this.length, 0, -60),
+				translateX: this.origin.x + widthOfRotatedRectangle(this.baselineLength, 0, -60),
+				translateY: this.origin.y + heightOfRotatedRectangle(this.baselineLength, 0, -60),
 				rotate: -60, 
 				origin: "bottom left", // origin "bottom right" is positioned much too far to the right
 			};
@@ -177,7 +177,7 @@ class Word {
 			attachPointX = -20 - this.attachPoints.length * descenderOffset;
 		}
 		if (this.direction == "downRight" || this.direction == "downLeft") {
-			attachPointX = this.length - attachPointX; // attach to the right end instead of the left
+			attachPointX = this.baselineLength - attachPointX; // attach to the right end instead of the left
 		}
 
 		var attachPoint = new Point(attachPointX, 0);
@@ -187,11 +187,11 @@ class Word {
 	render() {
 		this.group.remove();
 		this.group = draw.group();
-		this.group.addClass('word')
+		this.group.addClass('word');
 		this.wordSvg = this.createWordSvg();
-		this.line = this.createLine();
+		this.baseline = this.createBaseline();
 
-		this.group.add(this.line);
+		this.group.add(this.baseline);
 		this.group.add(this.wordSvg);
 
 		this.transformGroup();
@@ -283,8 +283,8 @@ class Word {
 	}
 
 	addStairstep(options) {
-		const downLineEndpoint = new Point(this.lineEndpoint.x, this.lineEndpoint.y + 30)
-		const downLine = draw.line(...this.lineEndpoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
+		const downLineEndpoint = new Point(this.baselineEndpoint.x, this.baselineEndpoint.y + 30)
+		const downLine = draw.line(...this.baselineEndpoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
 		const newWord = new Word({
 			type: 'stairstep',
 			origin: downLineEndpoint,
@@ -375,7 +375,7 @@ class Clause {
 	}
 
 	drawSubjectVerbDivider() {
-		this.sentenceDividerX = this.proceedInSentenceDirection(this.origin.x, this.subject.length);
+		this.sentenceDividerX = this.proceedInSentenceDirection(this.origin.x, this.subject.baselineLength);
 		let startY = this.origin.y - 30;
 		let endY = this.origin.y + 20;
 		const subjectVerbDivider = draw.line(
