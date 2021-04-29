@@ -1,4 +1,4 @@
-const darkMode = false;
+const darkMode = true;
 const foregroundColor = darkMode ? "white" : "black";
 const lineStyle = { width: 3, color: foregroundColor, linecap: 'round' };
 const textFont = { size: 24, fill: foregroundColor };
@@ -67,6 +67,7 @@ function degreesToRadians(degrees) {
 class Word {
 	/**
 	 * @param {object} options
+	 * @param {string} [options.type] 'underslant', 'understraight', etc.
 	 * @param {Point} options.origin For LTR words this will be the left edge; for RTL words it will be the right edge.
 	 * @param {string} options.text
 	 * @param {string} options.label
@@ -75,6 +76,7 @@ class Word {
 	 * @param {boolean} [options.debug] Highlight origin
 	 */
 	constructor(options) {
+		this.type = options.type;
 		this.origin = options.origin;
 		this.text = options.text;
 		this.label = options.label;
@@ -107,6 +109,7 @@ class Word {
 		};
 		if (!this.text) this.text = " ";
 		var text = draw.text(this.text).attr(attributes).font(textFont);
+		// FIXME
 		this.length = this.calcLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
 		return text.add(label);
@@ -116,7 +119,7 @@ class Word {
 		var descendersWidth = 0;
 		// add space for each descender
 		this.descenders.forEach(descender => {
-			if (descender.direction == "downLeft" || descender.direction == "downRight") {
+			if (['underslant', 'underslantThenStraight'].includes(descender.type)) {
 				descendersWidth += 40;
 			}
 		})
@@ -223,6 +226,7 @@ class Word {
 	addUnderslant(options) {
 		const attachPoint = this.newAttachPoint();
 		const newWord = new Word({
+			type: 'underslant',
 			origin: attachPoint,
 			text: options.text,
 			label: options.label,
@@ -258,11 +262,12 @@ class Word {
 	addUnderslantThenStraight(options) {
 		const attachPoint = this.newAttachPoint();
 		const downLineEndpoint = new Point(
-			rightOrLeft(options, attachPoint.x + 17, attachPoint.x - 20),
+			rightOrLeft(options, attachPoint.x + 17, attachPoint.x - 17),
 			attachPoint.y + 30
 		)
 		const downLine = draw.line(...attachPoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
 		const newWord = new Word({
+			type: 'underslantThenStraight',
 			origin: downLineEndpoint,
 			text: options.text,
 			label: options.label,
@@ -281,6 +286,7 @@ class Word {
 		const downLineEndpoint = new Point(this.lineEndpoint.x, this.lineEndpoint.y + 30)
 		const downLine = draw.line(...this.lineEndpoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
 		const newWord = new Word({
+			type: 'stairstep',
 			origin: downLineEndpoint,
 			text: options.text,
 			label: options.label,
