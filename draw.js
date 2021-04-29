@@ -99,6 +99,15 @@ class Word {
 			...this.baselineEndpoint.xy,
 		).stroke(lineStyle);
 	}
+	createDescendingLine() {
+		const attachPoint = this.newAttachPoint();
+		const endpoint = new Point(
+			rightOrLeft(this, attachPoint.x + 17, attachPoint.x - 17),
+			attachPoint.y + 30
+		);
+		this.descendingLine = draw.line(...attachPoint.xy, ...endpoint.xy).stroke(lineStyle);
+		this.descendingLine.endpoint = endpoint;
+	}
 	createWordSvg() {
 		var attributes = isRightPointing(this) ? {
 			x: 20, y: -38,
@@ -190,6 +199,9 @@ class Word {
 		this.group.addClass('word');
 		this.wordSvg = this.createWordSvg();
 		this.baseline = this.createBaseline();
+		if (this.type == "underslantThenStraight") {
+			this.createDescendingLine();
+		}
 
 		this.group.add(this.baseline);
 		this.group.add(this.wordSvg);
@@ -260,22 +272,17 @@ class Word {
 	}
 
 	addUnderslantThenStraight(options) {
-		const attachPoint = this.newAttachPoint();
-		const downLineEndpoint = new Point(
-			rightOrLeft(options, attachPoint.x + 17, attachPoint.x - 17),
-			attachPoint.y + 30
-		)
-		const downLine = draw.line(...attachPoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
+		this.createDescendingLine();
 		const newWord = new Word({
 			type: 'underslantThenStraight',
-			origin: downLineEndpoint,
+			origin: this.descendingLine.endpoint,
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
 			debug: options.debug,
 			parent: this,
 		});
-		this.children.push(downLine);
+		this.children.push(this.descendingLine);
 		this.children.push(newWord);
 		this.descenders.push(newWord);
 		this.recursiveRender(this);
