@@ -99,11 +99,12 @@ class Word {
 			...this.baselineEndpoint.xy,
 		).stroke(lineStyle);
 	}
-	createDescendingLine() {
+	createDescendingLine(depth = 30) {
+		const angle = 17/30;
 		const attachPoint = this.newAttachPoint();
 		const endpoint = new Point(
-			rightOrLeft(this, attachPoint.x + 17, attachPoint.x - 17),
-			attachPoint.y + 30
+			rightOrLeft(this, attachPoint.x + depth * angle, attachPoint.x - depth * angle),
+			attachPoint.y + depth
 		);
 		this.descendingLine = draw.line(...attachPoint.xy, ...endpoint.xy).stroke(lineStyle);
 		this.descendingLine.endpoint = endpoint;
