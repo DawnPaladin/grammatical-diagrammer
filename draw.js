@@ -73,6 +73,7 @@ class Word {
 	 * @param {string} options.label
 	 * @param {string} options.direction One of "left", "right", "downLeft", "downRight"
 	 * @param {object} [options.parent]
+	 * @param {object} [options.descendingLine]
 	 * @param {boolean} [options.debug] Highlight origin
 	 */
 	constructor(options) {
@@ -82,10 +83,10 @@ class Word {
 		this.label = options.label;
 		this.direction = options.direction;
 		this.parent = options.parent;
+		this.descendingLine = options.descendingLine;
 		this.debug = options.debug;
 
 		this.group = draw.group();
-		this.attachPoints = []; // regularly-spaced points on the baseline for descenders to attach to
 		this.descenders = []; // underslants descending from this baseline
 		this.children = []; // all baselines that depend on this Word for their position, including descenders and stairsteps
 
@@ -100,14 +101,18 @@ class Word {
 		).stroke(lineStyle);
 	}
 	createDescendingLine(depth = 30) {
-		const angle = 17/30;
-		const attachPoint = this.newAttachPoint();
+		const angle = 17 / 30;
 		const endpoint = new Point(
-			rightOrLeft(this, attachPoint.x + depth * angle, attachPoint.x - depth * angle),
-			attachPoint.y + depth
+			rightOrLeft(this, this.origin.x + depth * angle, this.origin.x - depth * angle),
+			this.origin.y + depth
 		);
-		this.descendingLine = draw.line(...attachPoint.xy, ...endpoint.xy).stroke(lineStyle);
-		this.descendingLine.endpoint = endpoint;
+		const descendingLine = draw.line(...this.origin.xy, ...endpoint.xy).stroke(lineStyle);
+		descendingLine.type = 'descendingLine';
+		descendingLine.endpoint = endpoint;
+		descendingLine.group = draw.group();
+		descendingLine.group.addClass('descending-line');
+		descendingLine.group.add(descendingLine);
+		return descendingLine;
 	}
 	createWordSvg() {
 		var attributes = isRightPointing(this) ? {
@@ -155,8 +160,8 @@ class Word {
 		var y = 0;
 		return new Point(x, y);
 	}
-	transformGroup() {
-		let transformation = { translateX: this.origin.x, translateY: this.origin.y };
+	transformGroup(origin = this.origin) {
+		let transformation = { translateX: origin.x, translateY: origin.y };
 
 		// if the line should be diagonal, rotate it downward
 		if (this.direction == "downRight") {
@@ -164,8 +169,8 @@ class Word {
 		}
 		if (this.direction == "downLeft" ) {
 			transformation = {
-				translateX: this.origin.x + widthOfRotatedRectangle(this.baselineLength, 0, -60),
-				translateY: this.origin.y + heightOfRotatedRectangle(this.baselineLength, 0, -60),
+				translateX: origin.x + widthOfRotatedRectangle(this.baselineLength, 0, -60),
+				translateY: origin.y + heightOfRotatedRectangle(this.baselineLength, 0, -60),
 				rotate: -60, 
 				origin: "bottom left", // origin "bottom right" is positioned much too far to the right
 			};
@@ -175,46 +180,57 @@ class Word {
 			transformation = {...transformation, rotate: -60, origin: "bottom left" };
 		}
 		if (this.direction == "left" && this.parent && this.parent.direction == "downLeft") {
-			transformation = {translateX: -this.origin.x, translateY: -this.origin.y, rotate: 60, origin: "bottom right" };
+			transformation = {translateX: -origin.x, translateY: -origin.y, rotate: 60, origin: "bottom right" };
 		}
 		this.group.transform(transformation);
 	}
-	newAttachPoint() {
+	getAttachPoint() {
 		// don't conditionalize this - the downRight/downLeft conditional expects it
-		var attachPointX = 20 + this.attachPoints.length * descenderOffset;
+		var attachPointX = 20 + this.descenders.length * descenderOffset;
 
 		if (this.direction == "left") {
-			attachPointX = -20 - this.attachPoints.length * descenderOffset;
+			attachPointX = -20 - this.descenders.length * descenderOffset;
 		}
 		if (this.direction == "downRight" || this.direction == "downLeft") {
 			attachPointX = this.baselineLength - attachPointX; // attach to the right end instead of the left
 		}
 
 		var attachPoint = new Point(attachPointX, 0);
-		this.attachPoints.push(attachPoint);
 		return attachPoint;
 	}
 	render() {
+		if (this.descendingLine) this.descendingLine.remove();
 		this.group.remove();
 		this.group = draw.group();
 		this.group.addClass('word');
+
+		if (this.type == "underslantThenStraight") {
+			this.descendingLine = this.createDescendingLine();
+		}
+
 		this.wordSvg = this.createWordSvg();
 		this.baseline = this.createBaseline();
-		if (this.type == "underslantThenStraight") {
-			this.createDescendingLine();
-		}
 
 		this.group.add(this.baseline);
 		this.group.add(this.wordSvg);
+		if (this.descendingLine)  {
+			this.descendingLine.group.add(this.group);
 
-		this.transformGroup();
+			this.transformGroup(this.descendingLine.endpoint);
+		} else {
+			this.transformGroup();
+		}
 
 		this.children.forEach(child => {
-			child.group ? this.group.add(child.group) : this.group.add(child);
-		})
+			if (child.type == "underslantThenStraight") {
+				this.group.add(child.descendingLine.group);
+			} else {
+				child.group ? this.group.add(child.group) : this.group.add(child);
+			}
+		});
 
 		if (this.debug == true) {
-			var originLabel = draw.text('O').cx(0).cy(0).fill('silver').addClass(`word-${this.text}-origin`);
+			var originLabel = draw.text('O').cx(0).cy(-11).fill('silver').addClass(`word-${this.text}-origin`)
 			this.group.add(originLabel)
 		}
 	}
@@ -237,7 +253,7 @@ class Word {
 	 * @returns {Word}
 	 */
 	addUnderslant(options) {
-		const attachPoint = this.newAttachPoint();
+		const attachPoint = this.getAttachPoint();
 		const newWord = new Word({
 			type: 'underslant',
 			origin: attachPoint,
@@ -254,7 +270,7 @@ class Word {
 	}
 
 	addUnderstraight(options) {
-		const attachPoint = this.newAttachPoint();
+		const attachPoint = this.getAttachPoint();
 		const downLineEndpoint = new Point(attachPoint.x, attachPoint.y + 30)
 		const downLine = draw.line(...attachPoint.xy, ...downLineEndpoint.xy).stroke(lineStyle);
 		const newWord = new Word({
@@ -273,17 +289,15 @@ class Word {
 	}
 
 	addUnderslantThenStraight(options) {
-		this.createDescendingLine();
 		const newWord = new Word({
 			type: 'underslantThenStraight',
-			origin: this.descendingLine.endpoint,
+			origin: this.getAttachPoint(),
 			text: options.text,
 			label: options.label,
 			direction: options.direction,
 			debug: options.debug,
 			parent: this,
 		});
-		this.children.push(this.descendingLine);
 		this.children.push(newWord);
 		this.descenders.push(newWord);
 		this.recursiveRender(this);
