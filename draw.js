@@ -1,4 +1,4 @@
-const darkMode = true;
+const darkMode = false;
 const foregroundColor = darkMode ? "white" : "black";
 const lineStyle = { width: 3, color: foregroundColor, linecap: 'round' };
 const textFont = { size: 24, fill: foregroundColor };
@@ -100,11 +100,13 @@ class Word {
 			...this.baselineEndpoint.xy,
 		).stroke(lineStyle);
 	}
-	createDescendingLine(depth = 30) {
+	createDescendingLine() {
+		const origin = this.origin;
+		const depth = this.depth;
 		const angle = 17 / 30;
 		const endpoint = new Point(
-			rightOrLeft(this, this.origin.x + depth * angle, this.origin.x - depth * angle),
-			this.origin.y + depth
+			rightOrLeft(this, origin.x + depth * angle, origin.x - depth * angle),
+			origin.y + depth
 		);
 		const descendingLine = draw.line(...this.origin.xy, ...endpoint.xy).stroke(lineStyle);
 		descendingLine.type = 'descendingLine';
@@ -198,6 +200,16 @@ class Word {
 		var attachPoint = new Point(attachPointX, 0);
 		return attachPoint;
 	}
+	prevDescender() {
+		const siblings = this.parent.descenders;
+		const myIndex = siblings.indexOf(this);
+		return siblings[myIndex - 1];
+	}
+	nextDescender() {
+		const siblings = this.parent.descenders;
+		const myIndex = siblings.indexOf(this);
+		return siblings[myIndex + 1];
+	}
 	render() {
 		if (this.descendingLine) this.descendingLine.remove();
 		this.group.remove();
@@ -205,6 +217,13 @@ class Word {
 		this.group.addClass('word');
 
 		if (this.type == "underslantThenStraight") {
+			if (this.prevDescender() && this.prevDescender().type == "underslantThenStraight") {
+				this.prevDescender().render();
+			} else if (this.nextDescender() && this.nextDescender().type == "underslantThenStraight") {
+				this.depth = this.depth + 80;
+			} else {
+				this.depth = 30;
+			}
 			this.descendingLine = this.createDescendingLine();
 		}
 

@@ -35,7 +35,7 @@ function lowercaseFirstLetter(string) {
 }
 
 function parseTag(tag, parentDiagram) {
-	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(400, 40);
+	var defaultOrigin = preferEnglish ? new Point(10, 40) : new Point(500, 40);
 	if (tag.attributes && tag.attributes[textAttr] !== undefined) {
 		// tag has text on it
 		var text = tag.attributes[textAttr];
