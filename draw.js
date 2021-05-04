@@ -89,6 +89,8 @@ class Word {
 		this.group = draw.group();
 		this.descenders = []; // underslants descending from this baseline
 		this.children = []; // all baselines that depend on this Word for their position, including descenders and stairsteps
+		this.spaceBelow = 0;
+		this.spaceAbove = 0;
 
 		this.render();
 	}
@@ -130,6 +132,19 @@ class Word {
 		this.baselineLength = this.calcBaselineLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
 		return text.add(label);
+	}
+	addSpace(direction, amount) {
+		if (direction === "below") {
+			this.spaceBelow = Math.max(this.spaceBelow, amount);
+			if (this.parent) {
+				this.parent.addSpace(direction, amount);
+			}
+		} else if (direction === "above") {
+			this.spaceAbove = Math.max(this.spaceAbove, amount);
+			if (this.parent) {
+				this.parent.addSpace(direction, amount);
+			}
+		} else throw new Error("Invalid addSpace direction");
 	}
 	calcBaselineLength(wordSvg) {
 		var wordWidth = wordSvg.length() + 40;
@@ -216,13 +231,21 @@ class Word {
 		this.group = draw.group();
 		this.group.addClass('word');
 
+		if (this.type == "stairstep") {
+			this.addSpace('below', 30);
+		}
+		if (this.type == "underslant") {
+			if (this.baselineLength) this.addSpace('below', heightOfRotatedRectangle(this.baselineLength, 0, -60));
+		}
 		if (this.type == "underslantThenStraight") {
 			if (this.prevDescender() && this.prevDescender().type == "underslantThenStraight") {
 				this.prevDescender().render();
 			} else if (this.nextDescender() && this.nextDescender().type == "underslantThenStraight") {
-				this.depth = this.depth + 80;
+				this.depth = this.spaceBelow + 45;
+				this.addSpace('below', this.depth);
 			} else {
 				this.depth = 30;
+				this.addSpace('below', 30);
 			}
 			this.descendingLine = this.createDescendingLine();
 		}
