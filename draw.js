@@ -86,12 +86,11 @@ class Word {
 		this.parent = options.parent;
 		this.descendingLine = options.descendingLine;
 		this.debug = options.debug;
+		this.depth = 0;
 
 		this.group = draw.group();
 		this.descenders = []; // underslants descending from this baseline
 		this.children = []; // all baselines that depend on this Word for their position, including descenders and stairsteps
-		this.spaceBelow = 0;
-		this.spaceAbove = 0;
 
 		this.render();
 	}
@@ -133,19 +132,6 @@ class Word {
 		this.baselineLength = this.calcBaselineLength(text); // Calculating the length of <text> with a <title> child crashes under svgdom, so we calculate it now and cache it
 		var label = draw.element('title').words(this.label);
 		return text.add(label);
-	}
-	addSpace(direction, amount) {
-		if (direction === "below") {
-			this.spaceBelow = Math.max(this.spaceBelow, amount);
-			if (this.parent) {
-				this.parent.addSpace(direction, amount);
-			}
-		} else if (direction === "above") {
-			this.spaceAbove = Math.max(this.spaceAbove, amount);
-			if (this.parent) {
-				this.parent.addSpace(direction, amount);
-			}
-		} else throw new Error("Invalid addSpace direction");
 	}
 	calcBaselineLength(wordSvg) {
 		var wordWidth = wordSvg.length() + 40;
@@ -216,14 +202,27 @@ class Word {
 		var attachPoint = new Point(attachPointX, 0);
 		return attachPoint;
 	}
+	getFamilyDepth() {
+		const childrenDepths = this.children.map(child => {
+			if (typeof child.getFamilyDepth == 'function') {
+				return child.getFamilyDepth();
+			} else {
+				return 0;
+			}
+		})
+		var deepestChildDepth = childrenDepths.length > 0 ? Math.max(...childrenDepths) : 0;
+		return this.depth + deepestChildDepth;
+	}
 	prevDescender() {
 		const siblings = this.parent.descenders;
 		const myIndex = siblings.indexOf(this);
+		if (myIndex == -1) return false;
 		return siblings[myIndex - 1];
 	}
 	nextDescender() {
 		const siblings = this.parent.descenders;
 		const myIndex = siblings.indexOf(this);
+		if (myIndex == -1) return false;
 		return siblings[myIndex + 1];
 	}
 	render() {
@@ -233,22 +232,21 @@ class Word {
 		this.group.addClass('word');
 
 		if (this.type == "stairstep") {
-			this.addSpace('below', 30);
+			this.depth = 30;
 		}
 		if (this.type == "underslant") {
-			if (this.baselineLength) this.addSpace('below', heightOfRotatedRectangle(this.baselineLength, 0, -60));
+			if (this.baselineLength) this.depth = heightOfRotatedRectangle(this.baselineLength, 0, -60);
 		}
 		if (this.type == "underslantThenStraight") {
-			if (this.prevDescender() && this.prevDescender().type == "underslantThenStraight") {
-				this.prevDescender().render();
-			} else if (this.nextDescender() && this.nextDescender().type == "underslantThenStraight") {
-				this.depth = this.spaceBelow + 45;
-				this.addSpace('below', this.depth);
+			if (this.nextDescender() && this.nextDescender().type == "underslantThenStraight") {
+				this.depth = this.nextDescender().getFamilyDepth() + 45;
 			} else {
 				this.depth = 30;
-				this.addSpace('below', 30);
 			}
 			this.descendingLine = this.createDescendingLine();
+			if (this.prevDescender() && this.prevDescender().type == "underslantThenStraight") {
+				this.prevDescender().render();
+			}
 		}
 
 		this.wordSvg = this.createWordSvg();
@@ -343,7 +341,7 @@ class Word {
 		});
 		this.children.push(newWord);
 		this.descenders.push(newWord);
-		this.recursiveRender(this);
+		this.recursiveRender(newWord);
 		return newWord;
 	}
 

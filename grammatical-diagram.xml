@@ -1,7 +1,21 @@
 <grammaticalDiagram>
-    <word gloss="happiness" word="אשרי">
-        <stairstep gloss="man" word="איש">
-            <underslant gloss="The"  word="הָ" />
-        </stairstep>
-    </word>
+                <verb gloss="Go" word="הלך">
+                    <underslant gloss="Not" word="לא" />
+					<underslantThenStraight gloss="In the counsel" word="uts1">
+						<stairstep gloss="( )" word="stairstep1">
+							<underslant gloss="Wicked" word="underslant1" />
+						</stairstep>
+                        <underslant word="underslant1a" />
+                    </underslantThenStraight>
+					<underslantThenStraight gloss="In the counsel" word="uts2">
+						<stairstep gloss="( )" word="stairstep2">
+							<underslant gloss="Wicked" word="underslant2" />
+						</stairstep>
+                    </underslantThenStraight>
+					<underslantThenStraight gloss="In the counsel" word="uts3">
+						<stairstep gloss="( )" word="stairstep3">
+							<underslant gloss="Wicked" word="underslant3" />
+						</stairstep>
+                    </underslantThenStraight>
+                </verb>
 </grammaticalDiagram>
