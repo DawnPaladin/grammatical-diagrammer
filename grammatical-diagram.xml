@@ -3,19 +3,18 @@
                     <underslant gloss="Not" word="לא" />
 					<underslantThenStraight gloss="In the counsel" word="uts1">
 						<stairstep gloss="( )" word="stairstep1">
-							<underslant gloss="Wicked" word="underslant1" />
 						</stairstep>
-                        <underslant word="underslant1a" />
                     </underslantThenStraight>
 					<underslantThenStraight gloss="In the counsel" word="uts2">
 						<stairstep gloss="( )" word="stairstep2">
-							<underslant gloss="Wicked" word="underslant2" />
+							<underslant gloss="Wicked" word="us3" />
 						</stairstep>
                     </underslantThenStraight>
 					<underslantThenStraight gloss="In the counsel" word="uts3">
 						<stairstep gloss="( )" word="stairstep3">
-							<underslant gloss="Wicked" word="underslant3" />
+							<underslant gloss="Wicked" word="us2" />
 						</stairstep>
+                        <underslant word="underslant1" />
                     </underslantThenStraight>
                 </verb>
 </grammaticalDiagram>
