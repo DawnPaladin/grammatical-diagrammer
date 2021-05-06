@@ -42,7 +42,7 @@ function parseTag(tag, parentDiagram) {
 		var label = tag.attributes.label || tag.name.toLowerCase();
 		var diagrammedTag, direction;
 		if (tagNameMatches(tag, "Word", "Subject", "Verb")) {
-			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left");
+			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left") || isRTL(text) ? "left" : "right";
 			diagrammedTag = new Word({ origin: defaultOrigin, text, label, direction });
 		} else if (tagNameMatches(tag, "Underslant")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "downRight", "downLeft");

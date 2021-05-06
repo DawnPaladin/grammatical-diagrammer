@@ -26,6 +26,7 @@ class Point {
  * @returns {any}
  */
 function rightOrLeft(object, ifRight, ifLeft) {
+	if (!object || !object.direction) return false;
 	if (object.direction == "right" || object.direction == "downRight")
 		return typeof ifRight === "function" ? ifRight() : ifRight;
 	else if (object.direction == "left" || object.direction == "downLeft") 
