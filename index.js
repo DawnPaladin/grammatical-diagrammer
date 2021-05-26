@@ -1,5 +1,5 @@
 
-import { Point, Clause, saveAs } from './draw.js';
+import { saveAs } from './draw.js';
 import parseXML from './parse-xml.js';
 import fs from 'fs';
 

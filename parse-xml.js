@@ -1,7 +1,7 @@
 import fs from 'fs';
 import convert from 'xml-js';
 import isRTL from './is-rtl.js';
-import { Point, Word, Clause, rightOrLeft, saveAs } from './draw.js';
+import { Point, Word, rightOrLeft, saveAs, BaselineGroup } from './draw.js';
 
 const preferEnglish = false;
 const textAttr = preferEnglish ? "gloss" : "word";
@@ -43,7 +43,7 @@ function parseTag(tag, parentDiagram) {
 		var diagrammedTag, direction;
 		if (tagNameMatches(tag, "Word", "Subject", "Verb")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "right", "left") || isRTL(text) ? "left" : "right";
-			diagrammedTag = new Word({ origin: defaultOrigin, text, label, direction });
+			diagrammedTag = new Word({ origin: defaultOrigin, text, label, direction, parent: parentDiagram });
 		} else if (tagNameMatches(tag, "Underslant")) {
 			direction = tag.attributes.direction || rightOrLeft(parentDiagram, "downRight", "downLeft");
 			diagrammedTag = parentDiagram.addUnderslant({ text, label, direction });
@@ -64,7 +64,16 @@ function parseTag(tag, parentDiagram) {
 				origin: defaultOrigin,
 				text: "",
 				label: "",
-				direction: preferEnglish ? "right" : "left"
+				direction: preferEnglish ? "right" : "left",
+				parent: parentDiagram,
+			});
+		} else if (tagNameMatches(tag, "BaselineGroup")) {
+			const baselines = tag.elements.map(parseTag);
+			diagrammedTag = new BaselineGroup({
+				origin: defaultOrigin,
+				direction: preferEnglish ? "right" : "left",
+				baselines,
+				parent: parentDiagram,
 			});
 		} else throw new Error("Unrecognized empty tag named " + tag.name);
 	}

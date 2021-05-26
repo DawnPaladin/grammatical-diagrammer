@@ -276,7 +276,10 @@ class Word {
 		}
 	}
 	recursiveRender(object) {
-		object.render();
+		if (typeof object.render == 'function') {
+			object.render();
+		};
+		// FIXME Parent of an object shouldn't be == 1. Might be something wrong with the rendering tree. Set a breakpoint right before the program exits and take a look.
 		if (object.parent) {
 			object.recursiveRender(object.parent)
 		}
@@ -370,6 +373,59 @@ class Word {
 	}
 }
 
+class BaselineGroup {
+	/**
+	 * @param {Object} options
+	 * @param {Word[]} options.baselines
+	 * @param {Point}  options.origin
+	 * @param {string} options.direction
+	 * @param {Object} options.parent
+	 */
+	constructor(options) {
+		this.children = options.baselines;
+		this.origin = options.origin;
+		this.direction = options.direction;
+		this.parent = options.parent;
+		
+		this.children.forEach(child => child.parent = this);
+
+		this.render();
+	}
+	render() {
+		if (this.children.length < 2) {
+			return;
+		} else {
+			const depths = this.children.map(word => { word.render(); return word.getFamilyDepth() });
+			const totalDepth = depths.reduce((a, b) => a + b, 0);
+			console.log(totalDepth);
+			if (totalDepth == 0) return;
+			// throw new Error("BaselineGroup children aren't reporting depth"); // this will result in the first for loop below looping infinitely due to interval equaling 0
+
+			// plotting the triangle the baselines will connect to
+			const topCorner = this.origin.y - totalDepth / 2;
+			const bottomCorner = this.origin.y + totalDepth / 2;
+			const upright = rightOrLeft(this, this.origin.x + 50, this.origin.x - 50);
+
+			const origins = [];
+			const interval = (bottomCorner - topCorner) / this.children.length;
+			for (var y = topCorner; y <= bottomCorner; y = y + interval) {
+				origins.push(new Point(upright, y));
+			}
+			if (origins.length !== this.children.length) throw new Error("Can't compute BaselineGroup origins");
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].origin = origins[i];
+				this.children[i].render();
+			}
+		}
+	}
+	recursiveRender(object) {
+		object.render();
+		if (object.parent) {
+			object.recursiveRender(object.parent)
+		}
+	}
+}
+
 class Clause {
 	/**
 	 * @param {object} options 
@@ -452,4 +508,4 @@ class Clause {
 
 const saveAs = draw; // so we can do saveAs.svg()
 
-export { Point, Word, Clause, saveAs, rightOrLeft };
+export { Point, Word, BaselineGroup, saveAs, rightOrLeft };
